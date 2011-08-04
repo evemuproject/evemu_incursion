@@ -139,7 +139,8 @@ SET( character_INCLUDE
      "${TARGET_INCLUDE_DIR}/character/CharacterAppearance_fields.h"
      "${TARGET_INCLUDE_DIR}/character/CharacterDB.h"
      "${TARGET_INCLUDE_DIR}/character/CharacterService.h"
-     "${TARGET_INCLUDE_DIR}/character/CharMgrService.h"
+     "${TARGET_INCLUDE_DIR}/character/CharFittingMgrService.h"
+	 "${TARGET_INCLUDE_DIR}/character/CharMgrService.h"
      "${TARGET_INCLUDE_DIR}/character/Skill.h"
      "${TARGET_INCLUDE_DIR}/character/SkillMgrService.h"
      "${TARGET_INCLUDE_DIR}/character/CharUnboundMgrService.h"
@@ -152,6 +153,7 @@ SET( character_SOURCE
      "${TARGET_SOURCE_DIR}/character/Character.cpp"
      "${TARGET_SOURCE_DIR}/character/CharacterDB.cpp"
      "${TARGET_SOURCE_DIR}/character/CharacterService.cpp"
+	 "${TARGET_SOURCE_DIR}/character/CharFittingMgrService.cpp"
      "${TARGET_SOURCE_DIR}/character/CharMgrService.cpp"
      "${TARGET_SOURCE_DIR}/character/Skill.cpp"
      "${TARGET_SOURCE_DIR}/character/SkillMgrService.cpp"
@@ -176,7 +178,12 @@ SET( chat_SOURCE
      "${TARGET_SOURCE_DIR}/chat/LSCService.cpp"
      "${TARGET_SOURCE_DIR}/chat/OnlineStatusService.cpp"
      "${TARGET_SOURCE_DIR}/chat/VoiceMgrService.cpp" )
-
+	 
+SET( fleet_INCLUDE
+	  "${TARGET_INCLUDE_DIR}/fleet/FleetProxy.h" )
+SET( fleet_SOURCE
+	  "${TARGET_SOURCE_DIR}/fleet/FleetProxy.cpp" )
+	  
 SET( inventory_INCLUDE
      "${TARGET_INCLUDE_DIR}/inventory/AttributeEnum.h"
      "${TARGET_INCLUDE_DIR}/inventory/AttributeMgr.h"
@@ -253,11 +260,13 @@ SET( mining_SOURCE
 SET( missions_INCLUDE
      "${TARGET_INCLUDE_DIR}/missions/Agent.h"
      "${TARGET_INCLUDE_DIR}/missions/AgentMgrService.h"
+	 "${TARGET_INCLUDE_DIR}/missions/DungeonExplorationMgrService.h"
      "${TARGET_INCLUDE_DIR}/missions/MissionDB.h"
      "${TARGET_INCLUDE_DIR}/missions/MissionMgrService.h" )
 SET( missions_SOURCE
      "${TARGET_SOURCE_DIR}/missions/Agent.cpp"
      "${TARGET_SOURCE_DIR}/missions/AgentMgrService.cpp"
+	 "${TARGET_SOURCE_DIR}/missions/DungeonExplorationMgrService.cpp"
      "${TARGET_SOURCE_DIR}/missions/MissionDB.cpp"
      "${TARGET_SOURCE_DIR}/missions/MissionMgrService.cpp" )
 
@@ -405,11 +414,31 @@ SET( imageserver_SOURCE
 SET( apiserver_INCLUDE
      "${TARGET_INCLUDE_DIR}/apiserver/APIServer.h"
      "${TARGET_INCLUDE_DIR}/apiserver/APIServerListener.h"
-     "${TARGET_INCLUDE_DIR}/apiserver/APIServerConnection.h" )
+     "${TARGET_INCLUDE_DIR}/apiserver/APIServerConnection.h"
+     "${TARGET_INCLUDE_DIR}/apiserver/APIServiceDB.h"
+     "${TARGET_INCLUDE_DIR}/apiserver/APICacheManager.h"
+     "${TARGET_INCLUDE_DIR}/apiserver/APIServiceManager.h"
+     "${TARGET_INCLUDE_DIR}/apiserver/APIAccountManager.h"
+     "${TARGET_INCLUDE_DIR}/apiserver/APIAdminManager.h"
+     "${TARGET_INCLUDE_DIR}/apiserver/APICharacterManager.h"
+     "${TARGET_INCLUDE_DIR}/apiserver/APICorporationManager.h"
+     "${TARGET_INCLUDE_DIR}/apiserver/APIEveSystemManager.h"
+     "${TARGET_INCLUDE_DIR}/apiserver/APIMapManager.h"
+     "${TARGET_INCLUDE_DIR}/apiserver/APIServerManager.h" )
 SET( apiserver_SOURCE
      "${TARGET_SOURCE_DIR}/apiserver/APIServer.cpp"
      "${TARGET_SOURCE_DIR}/apiserver/APIServerListener.cpp"
-     "${TARGET_SOURCE_DIR}/apiserver/APIServerConnection.cpp" )
+     "${TARGET_SOURCE_DIR}/apiserver/APIServerConnection.cpp"
+     "${TARGET_SOURCE_DIR}/apiserver/APIServiceDB.cpp"
+     "${TARGET_SOURCE_DIR}/apiserver/APICacheManager.cpp"
+     "${TARGET_SOURCE_DIR}/apiserver/APIServiceManager.cpp"
+     "${TARGET_SOURCE_DIR}/apiserver/APIAccountManager.cpp"
+     "${TARGET_SOURCE_DIR}/apiserver/APIAdminManager.cpp"
+     "${TARGET_SOURCE_DIR}/apiserver/APICharacterManager.cpp"
+     "${TARGET_SOURCE_DIR}/apiserver/APICorporationManager.cpp"
+     "${TARGET_SOURCE_DIR}/apiserver/APIEveSystemManager.cpp"
+     "${TARGET_SOURCE_DIR}/apiserver/APIMapManager.cpp"
+     "${TARGET_SOURCE_DIR}/apiserver/APIServerManager.cpp" )
 
 
 ########################
@@ -440,6 +469,7 @@ SOURCE_GROUP( "include\\corporation"   FILES ${corporation_INCLUDE} )
 SOURCE_GROUP( "include\\dogmaim"       FILES ${dogmaim_INCLUDE} )
 SOURCE_GROUP( "include\\character"     FILES ${character_INCLUDE} )
 SOURCE_GROUP( "include\\chat"          FILES ${chat_INCLUDE} )
+SOURCE_GROUP( "include\\fleet"		   FILES ${fleet_INCLUDE} )
 SOURCE_GROUP( "include\\inventory"     FILES ${inventory_INCLUDE} )
 SOURCE_GROUP( "include\\manufacturing" FILES ${manufacturing_INCLUDE} )
 SOURCE_GROUP( "include\\map"           FILES ${map_INCLUDE} )
@@ -473,6 +503,7 @@ SOURCE_GROUP( "src\\corporation"   FILES ${corporation_SOURCE} )
 SOURCE_GROUP( "src\\dogmaim"       FILES ${dogmaim_SOURCE} )
 SOURCE_GROUP( "src\\character"     FILES ${character_SOURCE} )
 SOURCE_GROUP( "src\\chat"          FILES ${chat_SOURCE} )
+SOURCE_GROUP( "src\\fleet"         FILES ${fleet_SOURCE} )
 SOURCE_GROUP( "src\\inventory"     FILES ${inventory_SOURCE} )
 SOURCE_GROUP( "src\\manufacturing" FILES ${manufacturing_SOURCE} )
 SOURCE_GROUP( "src\\map"           FILES ${map_SOURCE} )
@@ -507,6 +538,7 @@ ADD_EXECUTABLE( "${TARGET_NAME}"
                 ${dogmaim_INCLUDE}        ${dogmaim_SOURCE}
                 ${character_INCLUDE}      ${character_SOURCE}
                 ${chat_INCLUDE}           ${chat_SOURCE}
+				${fleet_INCLUDE}		  ${fleet_SOURCE}
                 ${inventory_INCLUDE}      ${inventory_SOURCE}
                 ${manufacturing_INCLUDE}  ${manufacturing_SOURCE}
                 ${map_INCLUDE}            ${map_SOURCE}
