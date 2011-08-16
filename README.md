@@ -16,6 +16,7 @@ do with the source code downloaded from this project.
 - Character portraits are working
 - Undocking and Docking is working
 - Items and Destiny are working
+- StargateJumping is working
 
 # Legal
 	------------------------------------------------------------------------------------
