@@ -666,8 +666,13 @@ PyResult BeyonceBound::Handle_Dock(PyCallArgs &call) {
 }
 
 PyResult BeyonceBound::Handle_StargateJump(PyCallArgs &call) {
+<<<<<<< HEAD
 	// Created by stryng (stryng@gmail.com) to make StarGate Jumps Possible due to the client request for 3 args :D
 	// Reflected in General.xmlp
+=======
+	// Created by the_stryg to make StarGate Jumps Possible due to the client request for 3 args :D
+	// Reflected i General.xmlp
+>>>>>>> b3f2d76853d1a27776dff0b0aa414d592d00a02e
 	Call_ThreeIntegerArgs arg;
 	if(!arg.Decode(&call.tuple)) {
 		codelog(CLIENT__ERROR, "%s: failed to decode args", call.client->GetName());
