@@ -464,7 +464,7 @@
     </tupleInline>
   </elementDef>
   
-  <!--Created by stryng <stryng@gmail.com> to allow stargateJumps which links to BeyonceService.cpp -->
+  <!-- Created by stryng <stryng@gmail.com> to allow stargateJumps which links to BeyonceService.cpp -->
   <elementDef name="Call_ThreeIntegerArgs">
 	 <tupleInline>
       <int name="arg1" />
