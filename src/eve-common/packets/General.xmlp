@@ -463,6 +463,15 @@
       <int name="arg2" />
     </tupleInline>
   </elementDef>
+  
+  <!--Created by stryng <stryng@gmail.com> to allow stargateJumps which links to BeyonceService.cpp -->
+  <elementDef name="Call_ThreeIntegerArgs">
+	 <tupleInline>
+      <int name="arg1" />
+      <int name="arg2" /> 
+	  <int name="arg3" />
+	 </tupleInline>
+  </elementDef>
 
   <elementDef name="Call_PointArg">
     <tupleInline>
