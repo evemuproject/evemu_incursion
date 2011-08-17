@@ -678,8 +678,3 @@ PyResult BeyonceBound::Handle_StargateJump(PyCallArgs &call) {
 	
 	return NULL;
 }
-
-	call.client->StargateJump(arg.arg1, arg.arg2);
-	
-	return NULL;
-}
