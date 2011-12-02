@@ -30,7 +30,8 @@ uint32 SystemBubble::m_bubbleIncrementer = 0;
 SystemBubble::SystemBubble(const GPoint &center, double radius)
 : m_center(center),
   m_radius(radius),
-  m_radius2(radius*radius)
+  m_radius2(radius*radius),
+  m_position_check_radius_sqrd((radius+BUBBLE_HYSTERESIS_METERS) * (radius+BUBBLE_HYSTERESIS_METERS))
 {
 	_log(DESTINY__BUBBLE_DEBUG, "Created new bubble %p at (%.2f,%.2f,%.2f) with radius %.2f", this, m_center.x, m_center.y, m_center.z, m_radius);
     m_bubbleIncrementer++;
@@ -196,7 +197,9 @@ void SystemBubble::GetEntities(std::set<SystemEntity *> &into) const {
 
 bool SystemBubble::InBubble(const GPoint &pt) const
 {
-    return(GVector(m_center, pt).lengthSquared() < m_radius2);
+    // Return true (we're still in this bubble) when System Entity is still within BUBBLE_RADIUS_METERS + BUBBLE_HYSTERESIS_METERS
+    // from the center of the bubble
+    return(GVector(m_center, pt).lengthSquared() < m_position_check_radius_sqrd);
 }
 
 //NOTE: not used right now. May never be used... see SystemManager::MakeSetState

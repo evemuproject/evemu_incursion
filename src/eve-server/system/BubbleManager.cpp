@@ -27,7 +27,6 @@
 
 //upon this interval, check for entities which may have wandered out of their bubble without a major event happening.
 static const uint32 BubbleWanderTimer_S = 30;
-static const double BubbleRadius_m = 500000;    // EVE retail uses 250km and allows grid manipulation, for simplicity we dont and have our grid much larger
 
 BubbleManager::BubbleManager()
 : m_wanderTimer(BubbleWanderTimer_S *1000)
@@ -102,16 +101,16 @@ void BubbleManager::Add(SystemEntity *ent, bool notify) {
 	}
 	// this System Entity is not in any existing bubble, so let's make a new bubble
     // using the current position of this System Entity, however, we want to create this
-    // new bubble's center 99.2% of the bubble radius further along the direction
-    // of travel from the position of this System Entity
+    // new bubble's center further along the direction of travel from the position of this
+    // System Entity by the amount specified by BUBBLE_HYSTERESIS_METERS and BUBBLE_RADIUS_METERS:
     GPoint newBubbleCenter(ent->GetPosition());
     GVector shipVelocity(ent->GetVelocity());
     shipVelocity.normalize();
-    newBubbleCenter.x += shipVelocity.x * (0.96 * BubbleRadius_m);
-    newBubbleCenter.y += shipVelocity.y * (0.96 * BubbleRadius_m);
-    newBubbleCenter.z += shipVelocity.z * (0.96 * BubbleRadius_m);
+    newBubbleCenter.x += shipVelocity.x * (BUBBLE_RADIUS_METERS - BUBBLE_HYSTERESIS_METERS);
+    newBubbleCenter.y += shipVelocity.y * (BUBBLE_RADIUS_METERS - BUBBLE_HYSTERESIS_METERS);
+    newBubbleCenter.z += shipVelocity.z * (BUBBLE_RADIUS_METERS - BUBBLE_HYSTERESIS_METERS);
 
-	in_bubble = new SystemBubble(newBubbleCenter, BubbleRadius_m);
+	in_bubble = new SystemBubble(newBubbleCenter, BUBBLE_RADIUS_METERS);
     sLog.Debug( "BubbleManager::Add()", "SystemEntity '%s' being added to NEW Bubble %u", ent->GetName(), in_bubble->GetBubbleID() );
 	//TODO: think about bubble colission. should we merge them?
 	m_bubbles.push_back(in_bubble);
