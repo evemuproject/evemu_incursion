@@ -20,25 +20,24 @@
 	Place - Suite 330, Boston, MA 02111-1307, USA, or go to
 	http://www.gnu.org/copyleft/lesser.txt.
 	------------------------------------------------------------------------------------
-	Author:		Zhur
+	Author:		Almamu
 */
 
-#ifndef __ITEMDB_H_INCL__
-#define __ITEMDB_H_INCL__
+
+#ifndef __INSURANCEDB_H_INCL__
+#define __INSURANCEDB_H_INCL__
 
 #include "ServiceDB.h"
 
-class ItemDB
+class InsuranceDB
 : public ServiceDB
 {
 public:
-	PyRep *ListStations( uint32 characterID );
-	PyRep *ListStationItems( uint32 characterID, uint32 stationID );
-	PyRep *ListItems( uint32 characterID );
-protected:
+	bool GetStationItems( std::vector<int32> &into, uint32 stationID, uint32 characterID );
+	PyRep* GetContracts( const std::vector<int32> &ships, uint32 characterID );
+	bool InsureShip( uint32 shipID, uint32 ownerID, double fraction );
+	bool UnInsureShip( uint32 shipID, uint32 characterID );
 };
-
-
 
 
 
