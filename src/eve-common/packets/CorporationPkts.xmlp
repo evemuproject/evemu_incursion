@@ -47,6 +47,7 @@
       <raw name="color2" />
       <raw name="color3" />
       <raw name="unknown" />
+      <int name="membershipEnabled" />
     </tupleInline>
   </elementDef>
 

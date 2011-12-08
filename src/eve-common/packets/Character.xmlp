@@ -206,7 +206,19 @@
       <int name="stationID" />
     </tupleInline>
   </elementDef>
+  <!-- This doesnt belongs to Character packets -->
+  <elementDef name="Call_InsureShip">
+    <tupleInline>
+      <int name="shipID" />
+      <real name="cost" />
+      <int name="type" />
+    </tupleInline>
+  </elementDef>
 
+  <elementDef name="Call_DamageModules">
+    <tupleInline>
+      <list name="data" />
+    </tupleInline>
+  </elementDef>
 </elements>
-
 
