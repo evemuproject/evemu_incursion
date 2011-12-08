@@ -343,14 +343,14 @@ bool CorporationDB::AddCorporation(Call_AddCorporation & corpInfo, uint32 charID
         "   taxRate, minimumJoinStanding, corporationType, hasPlayerPersonnelManager, sendCharTerminationMessage, "
         "   creatorID, ceoID, stationID, raceID, allianceID, shares, memberCount, memberLimit, "
         "   allowedMemberRaceIDs, graphicID, color1, color2, color3, shape1, shape2, shape3, "
-        "   typeface, isRecruiting, creatorID "
+        "   typeface, isRecruiting "
         "   ) "
         " SELECT "
         "       '%s', '%s', '%s', '%s', "
         "       %lf, 0, 2, 0, 1, "
         "       %u, %u, %u, chrBloodlines.raceID, 0, 1000, 0, 10, "
         "       chrBloodlines.raceID, 0, %s, %s, %s, %s, %s, %s, "
-        "       NULL, %u, %u "
+        "       NULL, %u "
         "    FROM entity "
         "       LEFT JOIN bloodlineTypes USING (typeID) "
         "       LEFT JOIN chrBloodlines USING (bloodlineID) "
@@ -365,7 +365,6 @@ bool CorporationDB::AddCorporation(Call_AddCorporation & corpInfo, uint32 charID
         _IoN(corpInfo.shape2).c_str(),
         _IoN(corpInfo.shape3).c_str(),
 		corpInfo.membershipEnabled,
-		charID,
         charID))
     {
         codelog(SERVICE__ERROR, "Error in query: %s", err.c_str());
