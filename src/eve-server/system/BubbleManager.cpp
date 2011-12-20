@@ -78,17 +78,25 @@ void BubbleManager::Process() {
 
 void BubbleManager::UpdateBubble(SystemEntity *ent, bool notify) {
 	SystemBubble *b = ent->Bubble();
-	if(b != NULL) {
-		if(b->InBubble(ent->GetPosition())) {
-			_log(DESTINY__BUBBLE_TRACE, "Entity %u is still located in bubble %p", ent->GetID(), b);
+	if(b != NULL)
+    {
+		if(b->InBubble(ent->GetPosition()))
+        {
+            _log(DESTINY__BUBBLE_DEBUG, "Entity %u at (%.2f,%.2f,%.2f) is still located in bubble %u at (%.2f,%.2f,%.2f) with radius %.2f", ent->GetID(), ent->GetPosition().x, ent->GetPosition().y, ent->GetPosition().z, b->GetBubbleID(), b->m_center.x, b->m_center.y, b->m_center.z, b->m_radius);
+			//_log(DESTINY__BUBBLE_TRACE, "Entity %u is still located in bubble %u", ent->GetID(), b->GetBubbleID());
 			//still in bubble...
+            sLog.Debug( "BubbleManager::UpdateBubble()", "SystemEntity '%s' is still located in Bubble %u", ent->GetName(), b->GetBubbleID() );
 			return;
 		}
-		_log(DESTINY__BUBBLE_TRACE, "Entity %u is no longer located in bubble %p", ent->GetID(), b);
+        _log(DESTINY__BUBBLE_DEBUG, "Entity %u at (%.2f,%.2f,%.2f) is no longer located in bubble %u at (%.2f,%.2f,%.2f) with radius %.2f", ent->GetID(), ent->GetPosition().x, ent->GetPosition().y, ent->GetPosition().z, b->GetBubbleID(), b->m_center.x, b->m_center.y, b->m_center.z, b->m_radius);
+        //_log(DESTINY__BUBBLE_TRACE, "Entity %u is no longer located in bubble %u", ent->GetID(), b->GetBubbleID());
 		b->Remove(ent, notify);
         sLog.Debug( "BubbleManager::UpdateBubble()", "SystemEntity '%s' being removed from Bubble %u", ent->GetName(), b->GetBubbleID() );
 	}
-	Add(ent, notify);
+    else
+        sLog.Debug( "BubbleManager::UpdateBubble()", "SystemEntity '%s' not currently in ANY Bubble!!!", ent->GetName() );
+
+    Add(ent, notify);
 }
 
 void BubbleManager::Add(SystemEntity *ent, bool notify) {

@@ -42,6 +42,8 @@ EVEServerConfig::EVEServerConfig()
 
     // account
     account.autoAccountRole = 0;
+    account.loginMessage = "";
+/*
     account.loginMessage =
         "<html>"
             "<head>"
@@ -57,7 +59,7 @@ EVEServerConfig::EVEServerConfig()
                 "EVEmu development team"
            "</body>"
         "</html>";
-
+*/
     // character
     character.startBalance = 6666000000.0f;
 	character.startStation = 60004420; // Todaki, when no longer needed, change to 0.

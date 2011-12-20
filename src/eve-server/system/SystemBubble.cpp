@@ -155,7 +155,7 @@ void SystemBubble::Add(SystemEntity *ent, bool notify) {
 	//regardless, notify everybody else in the bubble of the add.
 	_BubblecastAddBall(ent);
 	
-	_log(DESTINY__BUBBLE_DEBUG, "Adding entity %u to bubble %p at (%.2f,%.2f,%.2f) with radius %.2f", ent->GetID(), this, m_center.x, m_center.y, m_center.z, m_radius);
+    _log(DESTINY__BUBBLE_DEBUG, "Adding entity %u at (%.2f,%.2f,%.2f) to bubble %u at (%.2f,%.2f,%.2f) with radius %.2f", ent->GetID(), ent->GetPosition().x, ent->GetPosition().y, ent->GetPosition().z, this->GetBubbleID(), m_center.x, m_center.y, m_center.z, m_radius);
 	m_entities[ent->GetID()] = ent;
 	ent->m_bubble = this;
 	if(ent->IsStaticEntity() == false) {
@@ -169,7 +169,7 @@ void SystemBubble::Remove(SystemEntity *ent, bool notify) {
     if( ent->m_bubble == NULL )
         return;     // Get outta here in case this was called again
 
-	_log(DESTINY__BUBBLE_DEBUG, "Removing entity %u from bubble %p at (%.2f,%.2f,%.2f) with radius %.2f", ent->GetID(), this, m_center.x, m_center.y, m_center.z, m_radius);
+    _log(DESTINY__BUBBLE_DEBUG, "Removing entity %u at (%.2f,%.2f,%.2f) from bubble %u at (%.2f,%.2f,%.2f) with radius %.2f", ent->GetID(), ent->GetPosition().x, ent->GetPosition().y, ent->GetPosition().z, this->GetBubbleID(), m_center.x, m_center.y, m_center.z, m_radius);
 	ent->m_bubble = NULL;
 	m_entities.erase(ent->GetID());
 	m_dynamicEntities.erase(ent);
