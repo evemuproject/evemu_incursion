@@ -554,7 +554,7 @@ void DestinyManager::_Warp() {
 		velocity_magnitude = warp_progress * 3.0;
 		
         // Remove ship from bubble only when distance traveled takes the ship beyond the bubble's radius
-        m_system->bubbles.UpdateBubble(m_self);
+        m_system->bubbles.UpdateBubble(m_self,true,true);   // use optional 3rd param to indicate ship is warping so as to not add to new bubbles while accelerating into warp
 
         sLog.Debug( "DestinyManager::_Warp():", "Entity %u: Warp Accelerating: velocity %f m/s with %f m left to go.", 
 			m_self->GetID(),
@@ -590,7 +590,7 @@ void DestinyManager::_Warp() {
 		
 		velocity_magnitude = exp(v58) * m_warpState->speed / 3.0f;
 		
-		dist_remaining = velocity_magnitude / 1.65;
+		dist_remaining = velocity_magnitude;// / 1.65;
 		//dist_remaining = m_warpDecelerateFactor * velocity_magnitude;
 
 		if(velocity_magnitude < 0)
@@ -601,8 +601,16 @@ void DestinyManager::_Warp() {
 			velocity_magnitude, dist_remaining);
 		
 		// Put ourself back into a bubble once we reach the outer edge of the bubble's radius:
-        if( dist_remaining <= m_self->Bubble()->m_radius )
-		    m_system->bubbles.UpdateBubble(m_self);
+        if( dist_remaining <= (0.9 * BUBBLE_RADIUS_METERS) )
+        {
+            // This MUST be called BEFORE SetPosition() since SetPosition does not
+            // currently support passing in the isPostWarp boolean nor the isWarping boolean
+		    m_system->bubbles.UpdateBubble(m_self, true, false, true);
+
+            // HACK: broadcast our position every tic once inside radius of destination bubble
+            // This temporarily fixes the warp-in bug that led to incorrect position of ship at end of warp
+            SetPosition( GetPosition(), true, false, true );
+        }
 		
 		//note, this should actually be checked AFTER we change new_velocity.
 		//but hey, it doesn't get copied into ball.velocity until later anyhow.
@@ -815,7 +823,8 @@ void DestinyManager::Stop(bool update) {
         GPoint dest;
         m_self->CastToClient()->GetUndockAlignToPoint( dest );
         //AlignTo( dest, true );
-        GotoDirection( dest.normalize(), true );
+        dest.normalize();
+        GotoDirection( dest, true );
         SetSpeedFraction( 1.0, true );
     }
     else
@@ -946,6 +955,34 @@ void DestinyManager::Orbit(SystemEntity *who, double distance, bool update) {
 	}
 }
 
+void DestinyManager::OrbitingCruise(SystemEntity *who, double distance, bool update) {
+	if(State == DSTBALL_ORBIT && m_targetEntity.second == who && m_targetDistance == distance)
+		return;
+	
+	State = DSTBALL_ORBIT;
+	m_stateStamp = GetStamp()+1;
+	
+    m_targetEntity.first = who->GetID();
+	m_targetEntity.second = who;
+	m_targetDistance = distance;
+    /*if(m_userSpeedFraction == 0.0f)
+        m_userSpeedFraction = 1.0f;*/	//doesn't seem to do this.
+	//if(m_activeSpeedFraction != m_userSpeedFraction) {
+		m_activeSpeedFraction = 35.0 * m_userSpeedFraction;
+		_UpdateDerrived();
+	//}
+	
+	if(update) {
+		DoDestiny_Orbit du;
+		du.entityID = m_self->GetID();
+		du.orbitEntityID = who->GetID();
+		du.distance = uint32(distance);
+		
+		PyTuple *tmp = du.Encode();
+		SendSingleDestinyUpdate(&tmp);	//consumed
+	}
+}
+
 void DestinyManager::SetShipCapabilities(InventoryItemRef ship)
 {
 	double mass = ship->GetAttribute(AttrMass).get_float();               // Aknor: EVEAttributeMgr cant find this
@@ -981,7 +1018,7 @@ void DestinyManager::SetShipCapabilities(InventoryItemRef ship)
 	_UpdateDerrived();
 }
 
-void DestinyManager::SetPosition(const GPoint &pt, bool update) {
+void DestinyManager::SetPosition(const GPoint &pt, bool update, bool isWarping, bool isPostWarp) {
 	//m_body->setPosition( pt );
 	m_position = pt;
 	_log(PHYSICS__TRACE, "Entity %u set its position to (%.1f, %.1f, %.1f)",
@@ -997,7 +1034,7 @@ void DestinyManager::SetPosition(const GPoint &pt, bool update) {
 		PyTuple *tmp = du.Encode();
 		SendSingleDestinyUpdate(&tmp);	//consumed
 	}
-	m_system->bubbles.UpdateBubble(m_self, update);
+	m_system->bubbles.UpdateBubble(m_self, update, isWarping, isPostWarp);
 }
 
 void DestinyManager::SetSpeedFraction(double fraction, bool update) {

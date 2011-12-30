@@ -48,9 +48,11 @@ public:
 	void Process();
 	
 	//call whenever an entity may have left its bubble.
-	void UpdateBubble(SystemEntity *ent, bool notify=true);
+	void UpdateBubble(SystemEntity *ent, bool notify=true, bool isWarping=false, bool isPostWarp=false);
 	//call when an entity is added to the system.
-	void Add(SystemEntity *ent, bool notify);
+	void Add(SystemEntity *ent, bool notify, bool isPostWarp=false);
+    //call to calculate new bubble's center from entity's velocity:
+    void NewBubbleCenter(GVector shipVelocity, GPoint & newBubbleCenter);
 	//call when an entity is removed from the system.
 	void Remove(SystemEntity *ent, bool notify);
 	void clear();

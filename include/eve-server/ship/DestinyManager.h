@@ -65,7 +65,7 @@ public:
 	
 	//Configuration:
 	void SetShipCapabilities(InventoryItemRef ship);
-	void SetPosition(const GPoint &pt, bool update=true);
+	void SetPosition(const GPoint &pt, bool update=true, bool isWarping=false, bool isPostWarp=false);
 	
 	//Global Actions:
 	void Stop(bool update=true);
@@ -74,6 +74,7 @@ public:
 	//Local Movement:
 	void Follow(SystemEntity *who, double distance, bool update=true);
 	void Orbit(SystemEntity *who, double distance, bool update=true);
+	void OrbitingCruise(SystemEntity *who, double distance, bool update=true);
 	void SetSpeedFraction(double fraction, bool update=true);
 	void AlignTo(const GPoint &direction, bool update=true);
 	void GotoDirection(const GPoint &direction, bool update=true);
