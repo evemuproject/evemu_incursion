@@ -923,6 +923,8 @@ void DestinyManager::Follow(SystemEntity *who, double distance, bool update) {
 		SendSingleDestinyUpdate(&tmp);	//consumed
 	}
 
+    sLog.Debug( "DestinyManager::GotoDirection()", "SystemEntity '%s' following SystemEntity '%s' at velocity %f", this->m_self->GetName(), who->GetName(), m_velocity );
+
     // Forcibly set Speed since it doesn't get updated when Following upon Undock from stations:
     SetSpeedFraction( m_activeSpeedFraction, true );
 }
@@ -1081,6 +1083,8 @@ void DestinyManager::AlignTo(const GPoint &direction, bool update) {
 		PyTuple *tmp = du.Encode();
 		SendSingleDestinyUpdate(&tmp);	//consumed
 	}
+
+    sLog.Debug( "DestinyManager::GotoDirection()", "SystemEntity '%s' vectoring to (%f,%f,%f) at velocity %f", this->m_self->GetName(), direction.x, direction.y, direction.z, m_velocity );
 }
 
 void DestinyManager::GotoDirection(const GPoint &direction, bool update) {
@@ -1096,6 +1100,8 @@ void DestinyManager::GotoDirection(const GPoint &direction, bool update) {
 		_UpdateDerrived();
 	}
 	
+    sLog.Debug( "DestinyManager::GotoDirection()", "SystemEntity '%s' vectoring to (%f,%f,%f) at velocity %f", this->m_self->GetName(), direction.x, direction.y, direction.z, m_velocity );
+
 	if(update) {
 		DoDestiny_GotoDirection du;
 		du.entityID = m_self->GetID();
