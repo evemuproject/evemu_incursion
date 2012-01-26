@@ -345,8 +345,8 @@ void DestinyManager::_Move() {
     // Check to see if we have a pending docking operation and attempt to dock if so:
     if( m_self->CastToClient()->GetPendingDockOperation() )
         AttemptDockOperation();
-    else
-        _MoveAccel(calc_acceleration);
+
+    _MoveAccel(calc_acceleration);
 }
 
 void DestinyManager::_MoveAccel(const GVector &calc_acceleration) {
@@ -485,7 +485,10 @@ void DestinyManager::_InitWarp() {
         warp_speed = baseWarpSpeed * ((double)BASE_WARP_SPEED) * warpSpeedMultiplier * ((double)ONE_AU_IN_METERS);
     }
     else
+    {
+        sLog.Error( "DestinyManager::_InitWarp()", "ERROR - shipRef was NULL so default base warp speed of 3.0AU/s is being used.  This should not happen!" );
         warp_speed = m_system->GetWarpSpeed();
+    }
 
 	if(1.5*warp_distance < warp_speed) {//not positive on this conditional
 		warp_speed = 1.5*warp_distance;
@@ -815,6 +818,9 @@ void DestinyManager::EntityRemoved(SystemEntity *who) {
 	
 //Global Actions:
 void DestinyManager::Stop(bool update) {
+    //Clear any pending docking operation since the user stopped ship movement:
+    m_self->CastToClient()->SetPendingDockOperation( false );
+
     // THIS IS A HACK AS WE DONT KNOW WHY THE CLIENT CALLS STOP AT UNDOCK
     if( m_self->CastToClient()->GetJustUndocking() )
     {
@@ -868,6 +874,9 @@ void DestinyManager::Halt(bool update) {
 	m_activeSpeedFraction = 0.0f;
 	_UpdateDerrived();
 	
+    //Clear any pending docking operation since the user halted ship movement:
+    m_self->CastToClient()->SetPendingDockOperation( false );
+
 	State = DSTBALL_STOP;
 
 	//ensure that our bubble is correct.
@@ -913,6 +922,9 @@ void DestinyManager::Follow(SystemEntity *who, double distance, bool update) {
 		_UpdateDerrived();
 	}
 	
+    //Clear any pending docking operation since the user set a new course:
+    m_self->CastToClient()->SetPendingDockOperation( false );
+
 	if(update) {
 		DoDestiny_FollowBall du;
 		du.entityID = m_self->GetID();
@@ -970,7 +982,7 @@ void DestinyManager::OrbitingCruise(SystemEntity *who, double distance, bool upd
     /*if(m_userSpeedFraction == 0.0f)
         m_userSpeedFraction = 1.0f;*/	//doesn't seem to do this.
 	//if(m_activeSpeedFraction != m_userSpeedFraction) {
-		m_activeSpeedFraction = 35.0 * m_userSpeedFraction;
+		m_activeSpeedFraction = m_userSpeedFraction;
 		_UpdateDerrived();
 	//}
 	
@@ -1073,6 +1085,9 @@ void DestinyManager::AlignTo(const GPoint &direction, bool update) {
 		_UpdateDerrived();
 	}
 
+    //Clear any pending docking operation since the user set a new course:
+    m_self->CastToClient()->SetPendingDockOperation( false );
+
 	if(update) {
 		DoDestiny_GotoPoint du;
 		du.entityID = m_self->GetID();
@@ -1100,6 +1115,9 @@ void DestinyManager::GotoDirection(const GPoint &direction, bool update) {
 		_UpdateDerrived();
 	}
 	
+    //Clear any pending docking operation since the user set a new course:
+    m_self->CastToClient()->SetPendingDockOperation( false );
+
     sLog.Debug( "DestinyManager::GotoDirection()", "SystemEntity '%s' vectoring to (%f,%f,%f) at velocity %f", this->m_self->GetName(), direction.x, direction.y, direction.z, m_velocity );
 
 	if(update) {
@@ -1126,14 +1144,26 @@ PyResult DestinyManager::AttemptDockOperation()
 		return NULL;
 	}
 	
+    GPoint stationOrigin = static_cast< StationEntity* >( station )->GetPosition();
     GPoint stationDockPoint = static_cast< StationEntity* >( station )->GetStationObject()->GetStationType()->dockEntry();     //station->GetPosition();
     GVector stationDockOrientation = static_cast< StationEntity*>( station )->GetStationObject()->GetStationType()->dockOrientation();
     const GPoint &position = who->GetPosition();
 
+    // Calculate 1000m out from docking bay along dock orientation vector away from station:
+    stationOrigin.x += stationDockPoint.x;
+    stationOrigin.y += stationDockPoint.y;
+    stationOrigin.z -= stationDockPoint.z;
+    stationOrigin.x += 1000 * stationDockOrientation.x;
+    stationOrigin.y += 1000 * stationDockOrientation.y;
+    stationOrigin.z += (-1) * (1000 * stationDockOrientation.z);
+    //stationDockPoint.x += 1000 * stationDockOrientation.x;
+    //stationDockPoint.y += 1000 * stationDockOrientation.y;
+    //stationDockPoint.z += 1000 * stationDockOrientation.z;
+
 	OnDockingAccepted da;
-    da.end_x = stationDockPoint.x;
-    da.end_y = stationDockPoint.y;
-    da.end_z = stationDockPoint.z;
+    da.end_x = stationOrigin.x; //stationDockPoint.x;
+    da.end_y = stationOrigin.y; //stationDockPoint.y;
+    da.end_z = stationOrigin.z; //stationDockPoint.z;
     da.start_x = position.x;
 	da.start_y = position.y;
 	da.start_z = position.z;
@@ -1142,15 +1172,9 @@ PyResult DestinyManager::AttemptDockOperation()
 	GPoint start(da.start_x, da.start_y, da.start_z);
 	GPoint end(da.end_x, da.end_y, da.end_z);
 	GVector direction(start, end);
-	direction.normalize();
     double rangeToStation = direction.length();
-	
-    // Calculate 1000m out from docking bay along dock orientation vector away from station:
-    stationDockPoint.x += 1000 * stationDockOrientation.x;
-    stationDockPoint.y += 1000 * stationDockOrientation.y;
-    stationDockPoint.z += 1000 * stationDockOrientation.z;
 
-    GotoDirection( stationDockPoint, true );   // Turn ship and move toward docking point
+    GotoDirection( direction, true );   // Turn ship and move toward docking point
 
     // Verify range to station is within docking perimeter of 500 meters:
     if( (rangeToStation - station->GetRadius()) > 500 )
@@ -1178,7 +1202,11 @@ PyResult DestinyManager::AttemptDockOperation()
       Empty
     */
     // TODO: On docking failure: Send DoDestinyUpdates for GotoPoint for Station Dockpoint, SetBallMassive, SetBallMass
-    
+
+    // Stop Destiny from trying to move ship because it is about to dock and if Destiny keeps trying to move the ship after
+    // some point in the dock procedure, the server crashes hard.
+    Stop(false);
+
 	// When docking, Set X,Y,Z to origin so that when changing ships in stations, they don't appear outside:
 	who->MoveToLocation( stationID, GPoint(0, 0, 0) );
 
@@ -1254,6 +1282,9 @@ void DestinyManager::WarpTo(const GPoint &where, double distance, bool update) {
 		m_warpState = NULL;
 	}
 	
+    //Clear any pending docking operation since the user initiated warp:
+    m_self->CastToClient()->SetPendingDockOperation( false );
+
 	State = DSTBALL_WARP;
     m_targetEntity.first = 0;
 	m_targetEntity.second = NULL;
@@ -1323,6 +1354,9 @@ bool DestinyManager::_Turn() {
 void DestinyManager::SendJumpOut(uint32 stargateID) const {
 	std::vector<PyTuple *> updates;
 	
+    //Clear any pending docking operation since the user set a new course:
+    m_self->CastToClient()->SetPendingDockOperation( false );
+
 	{
 	DoDestiny_Stop du;
 	du.entityID = m_self->GetID();
@@ -1348,6 +1382,9 @@ void DestinyManager::SendJumpOut(uint32 stargateID) const {
 void DestinyManager::SendTerminalExplosion() const {
 	std::vector<PyTuple *> updates;
 	
+    //Clear any pending docking operation since the user's ship exploded:
+    m_self->CastToClient()->SetPendingDockOperation( false );
+
 	{
 		//send a warping special effects update...
 		DoDestiny_TerminalExplosion du;
@@ -1363,6 +1400,9 @@ void DestinyManager::SendJumpIn() const {
 	//hacked for simplicity... I dont like jumping in until we have
 	//jumping in general much better quantified.
 	
+    //Clear any pending docking operation since the user set a new course:
+    m_self->CastToClient()->SetPendingDockOperation( false );
+
 	std::vector<PyTuple *> updates;
 	
 	DoDestiny_OnSpecialFX10 effect;
