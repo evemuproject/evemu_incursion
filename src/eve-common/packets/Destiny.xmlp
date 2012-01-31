@@ -525,8 +525,8 @@ DST_WARPEXIT = 11
 		    <real name="dest_z" />
 		    <!-- 4 -->
 		    <int name="distance" />
-		    <!-- 5 -->
-		    <int name="u5" />
+		    <!-- 5: warp speed in AU/s times 10 -->
+		    <int name="warpSpeed" />
 	    </tupleInline>
 	  </tupleInline>
   </elementDef>

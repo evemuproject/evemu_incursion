@@ -1290,7 +1290,10 @@ void DestinyManager::WarpTo(const GPoint &where, double distance, bool update) {
 	m_targetEntity.second = NULL;
 	m_targetPoint = where;
 	m_targetDistance = distance;
-	
+
+    double warpSpeedMultiplier = m_self->CastToClient()->GetShip()->GetAttribute(AttrWarpSpeedMultiplier).get_float();
+    uint32 warpSpeedAUperSecondTimesTen = (uint32)(((double)BASE_WARP_SPEED) * warpSpeedMultiplier * 10);
+
 	if(update) {
 		std::vector<PyTuple *> updates;
 		
@@ -1301,7 +1304,7 @@ void DestinyManager::WarpTo(const GPoint &where, double distance, bool update) {
 		du.dest_y = where.y;
 		du.dest_z = where.z;
 		du.distance = static_cast<int32>(distance);
-		du.u5 = 30;
+		du.warpSpeed = warpSpeedAUperSecondTimesTen;
 		
 		updates.push_back(du.Encode());
 		}
