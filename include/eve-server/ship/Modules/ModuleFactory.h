@@ -55,7 +55,7 @@ static GenericModule* ModuleFactory(InventoryItemRef item, ShipRef ship)
             case EVEDB::invGroups::Armor_Repair_Projector:                  return NULL;    // Active
             case EVEDB::invGroups::Armor_Plating_Energized:                 return NULL;    // Active
             case EVEDB::invGroups::Armor_Hardener:                          return NULL;    // Active
-            case EVEDB::invGroups::Armor_Reinforcer:                        new PassiveModule(item, ship); break;
+            case EVEDB::invGroups::Armor_Reinforcer:                        return (new PassiveModule(item, ship)); break;
             case EVEDB::invGroups::Remote_Hull_Repairer:                    return NULL;    // Active
             case EVEDB::invGroups::Expanded_Cargohold:                      return NULL;    // Passive
 
@@ -78,7 +78,7 @@ static GenericModule* ModuleFactory(InventoryItemRef item, ShipRef ship)
             case EVEDB::invGroups::Capacitor_Battery:                       return NULL;    // Passive
             case EVEDB::invGroups::Energy_Transfer_Array:                   return NULL;    // Active
             case EVEDB::invGroups::Capacitor_Booster:                       return NULL;    // Active
-            case EVEDB::invGroups::Auxiliary_Power_Core:                    new PassiveModule(item, ship); break;
+            case EVEDB::invGroups::Auxiliary_Power_Core:                    return (new PassiveModule(item, ship)); break;
             case EVEDB::invGroups::Power_Diagnostic_System:                 return NULL;    // Passive
             case EVEDB::invGroups::Capacitor_Power_Relay:                   return NULL;    // Passive
             case EVEDB::invGroups::Capacitor_Flux_Coil:                     return NULL;    // Passive
@@ -123,7 +123,7 @@ static GenericModule* ModuleFactory(InventoryItemRef item, ShipRef ship)
             case EVEDB::invGroups::Gas_Cloud_Harvester:                     return NULL;    // Active
 
             // Propulsion Modules Subgroup:
-            case EVEDB::invGroups::Afterburner:                             return new Afterburner(item, ship); break;
+            case EVEDB::invGroups::Afterburner:                             return (new Afterburner(item, ship)); break;
             case EVEDB::invGroups::Warp_Core_Stabilizer:                    return NULL;    // Passive
             case EVEDB::invGroups::Inertial_Stabilizer:                     return NULL;    // Passive
             case EVEDB::invGroups::Nanofiber_Internal_Structure:            return NULL;    // Passive
@@ -150,7 +150,7 @@ static GenericModule* ModuleFactory(InventoryItemRef item, ShipRef ship)
             case EVEDB::invGroups::Hybrid_Weapon:                           return NULL;    // Active
             case EVEDB::invGroups::Heat_Sink:                               return NULL;    // Passive
             case EVEDB::invGroups::Magnetic_Field_Stabilizer:               return NULL;    // Passive
-            case EVEDB::invGroups::Ballistic_Control_system:                new PassiveModule(item, ship); break;
+            case EVEDB::invGroups::Ballistic_Control_system:                return (new PassiveModule(item, ship)); break;
             case EVEDB::invGroups::Missile_Launcher_Snowball:               return NULL;    // Active
             case EVEDB::invGroups::Missile_Launcher_Cruise:                 return NULL;    // Active
             case EVEDB::invGroups::Missile_Launcher_Rocket:                 return NULL;    // Active
@@ -197,19 +197,19 @@ static GenericModule* ModuleFactory(InventoryItemRef item, ShipRef ship)
             /*              Rigs                */
             /************************************/
 
-            case EVEDB::invGroups::Rig_Armor:                               return new RigModule(item, ship);
-            case EVEDB::invGroups::Rig_Shield:                              return new RigModule(item, ship);
-            case EVEDB::invGroups::Rig_Energy_Weapon:                       return new RigModule(item, ship);
-            case EVEDB::invGroups::Rig_Hybrid_Weapon:                       return new RigModule(item, ship);
-            case EVEDB::invGroups::Rig_Projectile_Weapon:                   return new RigModule(item, ship);
-            case EVEDB::invGroups::Rig_Drones:                              return new RigModule(item, ship);
-            case EVEDB::invGroups::Rig_Launcher:                            return new RigModule(item, ship);
-            case EVEDB::invGroups::Rig_Electronics:                         return new RigModule(item, ship);
-            case EVEDB::invGroups::Rig_Energy_Grid:                         return new RigModule(item, ship);
-            case EVEDB::invGroups::Rig_Astronautic:                         return new RigModule(item, ship);
-            case EVEDB::invGroups::Rig_Electronics_Superiority:             return new RigModule(item, ship);
-            case EVEDB::invGroups::Rig_Mining:                              return new RigModule(item, ship);
-            case EVEDB::invGroups::Rig_Security_Transponder:                return new RigModule(item, ship);
+            case EVEDB::invGroups::Rig_Armor:                               return (new RigModule(item, ship)); break;
+            case EVEDB::invGroups::Rig_Shield:                              return (new RigModule(item, ship)); break;
+            case EVEDB::invGroups::Rig_Energy_Weapon:                       return (new RigModule(item, ship)); break;
+            case EVEDB::invGroups::Rig_Hybrid_Weapon:                       return (new RigModule(item, ship)); break;
+            case EVEDB::invGroups::Rig_Projectile_Weapon:                   return (new RigModule(item, ship)); break;
+            case EVEDB::invGroups::Rig_Drones:                              return (new RigModule(item, ship)); break;
+            case EVEDB::invGroups::Rig_Launcher:                            return (new RigModule(item, ship)); break;
+            case EVEDB::invGroups::Rig_Electronics:                         return (new RigModule(item, ship)); break;
+            case EVEDB::invGroups::Rig_Energy_Grid:                         return (new RigModule(item, ship)); break;
+            case EVEDB::invGroups::Rig_Astronautic:                         return (new RigModule(item, ship)); break;
+            case EVEDB::invGroups::Rig_Electronics_Superiority:             return (new RigModule(item, ship)); break;
+            case EVEDB::invGroups::Rig_Mining:                              return (new RigModule(item, ship)); break;
+            case EVEDB::invGroups::Rig_Security_Transponder:                return (new RigModule(item, ship)); break;
 
 
             /************************************/
@@ -227,6 +227,9 @@ static GenericModule* ModuleFactory(InventoryItemRef item, ShipRef ship)
         }
     }
 
+    // THIS IS A MAJOR PROBLEM IF CODE EXECUTION MAKES IT TO THIS POINT,
+    // IT WILL CRASH THE SERVER IF NULL IS RETURNED:
+    sLog.Error( "ModuleFactory::ModuleFactory()", "CRITICAL!  NO Module Group was found for item '%s' (itemID = %u)", item->itemName().c_str(), item->itemID() );
     return NULL;
 }
 

@@ -489,6 +489,17 @@ bool Ship::ValidateItemSpecifics(InventoryItemRef equip) {
 }
 
 /* Begin new Module Manager Interface */
+uint32 Ship::FindAvailableModuleSlot( InventoryItemRef item )
+{
+    // TODO:
+    // 1) get slot bank (low, med, high, rig, subsystem) from dgmTypeEffects using item->itemID()
+    // 2) query this ship's ModuleManager to determine if there are any free slots in that bank,
+    //    it should return a slot flag number for the next available slot starting at the lowest number
+    //    for that bank
+    // 3) return that slot flag number
+
+    return flagAutoFit;
+}
 
 void Ship::AddItem(EVEItemFlags flag, InventoryItemRef item)
 {

@@ -38,7 +38,7 @@ public:
 
 	static void GetDgmEffects(uint32 effectID, DBQueryResult &res) 
 	{
-		if(sDatabase.RunQuery(res,
+		if( !sDatabase.RunQuery(res,
 			" SELECT "
 			" effectName, " 
 			" effectCategory, "
@@ -76,7 +76,7 @@ public:
 
 	static void GetDgmEffectsInfo(uint32 effectID, DBQueryResult &res)
 	{
-		if(sDatabase.RunQuery(res,
+		if( !sDatabase.RunQuery(res,
 			" SELECT "
 			" targetAttributeID, "
 			" sourceAttributeID, "
@@ -92,7 +92,7 @@ public:
 
 	static void GetDgmTypeEffectsInformation(uint32 typeID, DBQueryResult &res)
 	{
-		if(sDatabase.RunQuery(res,
+		if( !sDatabase.RunQuery(res,
 			" SELECT "
 			" effectID, "
 			" isDefault "

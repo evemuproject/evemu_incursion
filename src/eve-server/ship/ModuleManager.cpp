@@ -130,32 +130,37 @@ GenericModule * ModuleContainer::GetModule(uint32 itemID)
 	uint8 r;
 	for(r = 0; r < MAX_HIGH_SLOT_COUNT; r++)
 	{
-		if(m_HighSlotModules[r]->itemID() == itemID)
-			return m_HighSlotModules[r];
+        if( !(m_HighSlotModules[r] == NULL) )
+		    if(m_HighSlotModules[r]->itemID() == itemID)
+			    return m_HighSlotModules[r];
 	}
 
 	for(r = 0; r < MAX_MEDIUM_SLOT_COUNT; r++)
 	{
-		if(m_MediumSlotModules[r]->itemID() == itemID)
-			return m_MediumSlotModules[r];
+        if( !(m_MediumSlotModules[r] == NULL) )
+		    if(m_MediumSlotModules[r]->itemID() == itemID)
+			    return m_MediumSlotModules[r];
 	}
 
 	for(r = 0; r < MAX_LOW_SLOT_COUNT; r++)
 	{
-		if(m_LowSlotModules[r]->itemID() == itemID)
-			return m_LowSlotModules[r];
+        if( !(m_LowSlotModules[r] == NULL) )
+		    if(m_LowSlotModules[r]->itemID() == itemID)
+			    return m_LowSlotModules[r];
 	}
 
 	for(r = 0; r < MAX_ASSEMBLY_COUNT; r++)
 	{
-		if(m_SubSystemModules[r]->itemID() == itemID)
-			return m_SubSystemModules[r];
+        if( !(m_SubSystemModules[r] == NULL) )
+		    if(m_SubSystemModules[r]->itemID() == itemID)
+			    return m_SubSystemModules[r];
 	}
 
 	for(r = 0; r < MAX_RIG_COUNT; r++)
 	{
-		if(m_RigModules[r]->itemID() == itemID)
-			return m_RigModules[r];
+        if( !(m_RigModules[r] == NULL) )
+		    if(m_RigModules[r]->itemID() == itemID)
+			    return m_RigModules[r];
 	}
 
 	sLog.Warning("ModuleContainer","Search for itemID: %u yielded no results", itemID);
