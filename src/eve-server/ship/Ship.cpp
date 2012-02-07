@@ -173,8 +173,11 @@ bool Ship::_Load()
     bool loadSuccess = InventoryItem::_Load();      // Attributes are loaded here!
 
     // TODO: MOVE THIS TO Ship::Load() or some other place AFTER InventoryItem::mAttributeMap has been loaded
-	//allocate the module manager
-	m_ModuleManager = new ModuleManager(this);
+	// allocate the module manager, only the first time:
+    if( m_ModuleManager == NULL )
+	    m_ModuleManager = new ModuleManager(this);
+
+    // check for module manager load success
     if( m_ModuleManager == NULL )
         loadSuccess = false;
 

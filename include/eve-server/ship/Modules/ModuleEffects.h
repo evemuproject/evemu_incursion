@@ -185,6 +185,8 @@ public:
 	uint32 GetSourceAttributeID(uint32 count)					{ return m_Effects[m_SelectedEffect].m_SourceAttributeIDs[count]; }
 	EVECalculationType GetCalculationType(uint32 count)			{ return (EVECalculationType)m_Effects[m_SelectedEffect].m_CalculationTypeID[count];}
 	EVECalculationType GetReverseCalculationType(uint32 count)	{ return (EVECalculationType)m_Effects[m_SelectedEffect].m_ReverseCalculationTypeID[count];}
+	uint32 GetModuleStateWhenEffectApplied(uint32 count)		{ return m_Effects[m_SelectedEffect].m_EffectAppliedWhenIDs[count]; }
+	uint32 GetTargetTypeToWhichEffectApplied(uint32 count)		{ return m_Effects[m_SelectedEffect].m_EffectAppliedTargetIDs[count]; }
 
 private:
 
@@ -260,6 +262,8 @@ private:
 			m_SourceAttributeIDs = new int[res->GetRowCount()];
 			m_CalculationTypeID = new int[res->GetRowCount()];
 			m_ReverseCalculationTypeID = new int[res->GetRowCount()];
+            m_EffectAppliedWhenIDs = new int[res->GetRowCount()];
+            m_EffectAppliedTargetIDs = new int[res->GetRowCount()];
 
 			//counter
 			int count = 0;
@@ -270,6 +274,8 @@ private:
 				m_SourceAttributeIDs[count] = row2.GetInt(2);
 				m_CalculationTypeID[count] = row2.GetInt(3);
 				m_ReverseCalculationTypeID[count] = row2.GetInt(4);
+                m_EffectAppliedWhenIDs[count] = row2.GetInt(5);
+                m_EffectAppliedTargetIDs[count] = row2.GetInt(6);
 				count++;
 			}
 
@@ -284,6 +290,8 @@ private:
 		int * m_SourceAttributeIDs;
 		int * m_CalculationTypeID;
 		int * m_ReverseCalculationTypeID;
+        int * m_EffectAppliedWhenIDs;
+        int * m_EffectAppliedTargetIDs;
 		int m_numOfIDs;
 
 		int m_EffectID;

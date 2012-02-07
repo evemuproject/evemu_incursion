@@ -38,7 +38,8 @@ enum ModuleCommand
 	ACTIVATE,
 	DEACTIVATE,
 	OVERLOAD,   //idk if this is used yet - or what it's called :)
-	DEOVERLOAD  //idk if this is used
+	DEOVERLOAD, //idk if this is used
+    CYCLE       // used only by dgmEffectsInfo entries to indicate effects re-applied each cycle when in ACTIVATE state
 };
 
 //this may or may not be redundant...idk
@@ -95,7 +96,7 @@ static EvilNumber AddPercent(EvilNumber &val1, EvilNumber &val2)
 static EvilNumber AddAsPercent(EvilNumber &val1, EvilNumber &val2)
 {
 	EvilNumber val3 = 100;
-	return val1 + ( val1 * val2 / val3 );
+	return val1 + ( val1 * (val2 / val3) );
 }
 
 static EvilNumber SubtractPercent(EvilNumber &val1, EvilNumber &val2)

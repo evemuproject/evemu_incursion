@@ -81,7 +81,9 @@ public:
 			" targetAttributeID, "
 			" sourceAttributeID, "
 			" calculationTypeID, "
-			" reverseCalculationTypeID "
+			" reverseCalculationTypeID, "
+            " effectApplied, "
+            " effectAppliedTo "
 			" FROM dgmEffectsInfo "
 			" WHERE effectID = '%u' ",
 			effectID))

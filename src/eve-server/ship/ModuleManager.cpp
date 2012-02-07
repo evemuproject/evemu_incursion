@@ -533,14 +533,53 @@ void ModuleContainer::_initializeModuleContainers()
 #pragma region ModuleManagerClass
 ModuleManager::ModuleManager(Ship *const ship)
 {
-
+    // Create ModuleContainer object and initialize with sizes for all slot banks for this ship:
 	m_Modules = new ModuleContainer((uint32)ship->GetAttribute(AttrLowSlots).get_int(),
 									(uint32)ship->GetAttribute(AttrMedSlots).get_int(),
 									(uint32)ship->GetAttribute(AttrHiSlots).get_int(),
 									(uint32)ship->GetAttribute(AttrRigSlots).get_int(),
 									(uint32)ship->GetAttribute(AttrSubSystemSlot).get_int());
 
+    // Store reference to the Ship object to which the ModuleManager belongs:
 	m_Ship = ship;
+    
+    // Load modules, rigs and subsystems from Ship's inventory into ModuleContainer:
+    InventoryItemRef itemRef;
+    uint32 flagIndex;
+    for(flagIndex=flagLowSlot0; flagIndex<=flagLowSlot7; flagIndex++)
+    {
+        m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
+        if( !(itemRef == NULL) )
+            _fitModule( itemRef );
+    }
+
+    for(flagIndex=flagMedSlot0; flagIndex<=flagMedSlot7; flagIndex++)
+    {
+        m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
+        if( !(itemRef == NULL) )
+            _fitModule( itemRef );
+    }
+
+    for(flagIndex=flagHiSlot0; flagIndex<=flagHiSlot7; flagIndex++)
+    {
+        m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
+        if( !(itemRef == NULL) )
+            _fitModule( itemRef );
+    }
+
+    for(flagIndex=flagRigSlot0; flagIndex<=flagRigSlot7; flagIndex++)
+    {
+        m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
+        if( !(itemRef == NULL) )
+            _fitModule( itemRef );
+    }
+
+    for(flagIndex=flagSubSystem0; flagIndex<=flagSubSystem7; flagIndex++)
+    {
+        m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
+        if( !(itemRef == NULL) )
+            _fitModule( itemRef );
+    }
 }
 
 ModuleManager::~ModuleManager()
@@ -620,7 +659,7 @@ void ModuleManager::UnfitModule(uint32 itemID)
 
 void ModuleManager::_fitModule(InventoryItemRef item)
 {
-	GenericModule * mod = ModuleFactory(item, m_Ship->GetOperator()->GetShip());
+	GenericModule * mod = ModuleFactory(item, ShipRef(m_Ship));
 
 	m_Modules->AddModule(mod->flag(), mod);
 }
@@ -661,8 +700,8 @@ void ModuleManager::Deactivate(uint32 itemID, std::string effectName)
 	if( mod != NULL )
 	{
 		ModuleCommand cmd = _translateEffectName(effectName);
-		if(cmd  == OFFLINE)
-			mod->Offline();
+		//if(cmd == OFFLINE)
+		//	mod->Offline();     // this currently fails since m_selectedEffect and m_defaultEffect in the ModuleEffect class are undefined
 		//there needs to be more cases here i just don't know what they're called yet
 	}
 }
@@ -844,9 +883,9 @@ ModuleCommand ModuleManager::_translateEffectName(std::string s)
 	
 	switch(s[0])
 	{
-	case 'A': return ACTIVATE;
-	case 'D': return s[2] == 'a' ? DEACTIVATE : DEOVERLOAD;
-	case 'O': return s[1] == 'n' ? ONLINE : (s[1] == 'f' ? OFFLINE : OVERLOAD); //compound booleans ftw
+	case 'a': return ACTIVATE;
+	case 'd': return s[2] == 'a' ? DEACTIVATE : DEOVERLOAD;
+	case 'o': return s[1] == 'n' ? ONLINE : (s[1] == 'f' ? OFFLINE : OVERLOAD); //compound booleans ftw
 	}
 	
 	return CMD_ERROR;
