@@ -554,7 +554,7 @@ void Ship::RepairModules()
 
 int32 Ship::Activate(int32 itemID, std::string effectName, int32 targetID, int32 repeat)
 {
-	return 1;
+    return m_ModuleManager->Activate( itemID, effectName, targetID, repeat );
 }
 
 void Ship::Deactivate(int32 itemID, std::string effectName)

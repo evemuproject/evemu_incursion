@@ -544,41 +544,50 @@ ModuleManager::ModuleManager(Ship *const ship)
 	m_Ship = ship;
     
     // Load modules, rigs and subsystems from Ship's inventory into ModuleContainer:
-    InventoryItemRef itemRef;
     uint32 flagIndex;
     for(flagIndex=flagLowSlot0; flagIndex<=flagLowSlot7; flagIndex++)
     {
+        InventoryItemRef itemRef;
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
             _fitModule( itemRef );
+        itemRef.~RefPtr();
     }
 
     for(flagIndex=flagMedSlot0; flagIndex<=flagMedSlot7; flagIndex++)
     {
+        InventoryItemRef itemRef;
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
             _fitModule( itemRef );
+        itemRef.~RefPtr();
     }
 
     for(flagIndex=flagHiSlot0; flagIndex<=flagHiSlot7; flagIndex++)
     {
+        InventoryItemRef itemRef;
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
             _fitModule( itemRef );
+        itemRef.~RefPtr();
     }
 
     for(flagIndex=flagRigSlot0; flagIndex<=flagRigSlot7; flagIndex++)
     {
+        InventoryItemRef itemRef;
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
             _fitModule( itemRef );
+        itemRef.~RefPtr();
     }
 
     for(flagIndex=flagSubSystem0; flagIndex<=flagSubSystem7; flagIndex++)
     {
+        InventoryItemRef itemRef;
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
             _fitModule( itemRef );
+        itemRef.~RefPtr();
     }
 }
 
@@ -645,6 +654,9 @@ void ModuleManager::FitModule(InventoryItemRef item)
 		_fitModule(item);
 	else
 		sLog.Debug("ModuleManager","%s tried to fit item %u, which is not a module", m_Ship->GetOperator()->GetName(), item->itemID());
+
+    // Now that module is successfully fitted, put it online, if it can be:
+    Online(item->itemID());
 }
 
 void ModuleManager::UnfitModule(uint32 itemID)
@@ -690,8 +702,20 @@ void ModuleManager::OfflineAll()
 
 int32 ModuleManager::Activate(uint32 itemID, std::string effectName, uint32 targetID, uint32 repeat)
 {
-	sLog.Debug("Activate","Needs to be implemented");
-	return 1;
+	//sLog.Debug("Activate","Needs to be implemented");
+	//return 1;
+
+	GenericModule * mod = m_Modules->GetModule(itemID);
+	if( mod != NULL )
+	{
+		ModuleCommand cmd = _translateEffectName(effectName);
+        mod->getItem()->PutOnline();
+		//if(cmd == ONLINE)
+		//	mod->Online();     // this currently fails since m_selectedEffect and m_defaultEffect in the ModuleEffect class are undefined
+		//there needs to be more cases here i just don't know what they're called yet
+	}
+
+    return 1;
 }
 
 void ModuleManager::Deactivate(uint32 itemID, std::string effectName)
@@ -700,6 +724,7 @@ void ModuleManager::Deactivate(uint32 itemID, std::string effectName)
 	if( mod != NULL )
 	{
 		ModuleCommand cmd = _translateEffectName(effectName);
+        mod->getItem()->PutOffline();
 		//if(cmd == OFFLINE)
 		//	mod->Offline();     // this currently fails since m_selectedEffect and m_defaultEffect in the ModuleEffect class are undefined
 		//there needs to be more cases here i just don't know what they're called yet

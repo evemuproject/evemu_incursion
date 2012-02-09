@@ -39,11 +39,12 @@ public:
 	GenericModule() { }
 	virtual ~GenericModule() 
 	{
-		//warn user - yes be obnoxious
-		sLog.Error("GenericModule","MEMORY LEAK!");
+    // ALL DERIVED CLASSES SHOULD OVERRIDE THIS
+	//	//warn user - yes be obnoxious
+	//	sLog.Error("GenericModule","MEMORY LEAK!");
 
-		//force the users to override the inherited destructor
-		assert(false); //crash if they don't
+	//	//force the users to override the inherited destructor
+	//	assert(false); //crash if they don't
 	}
 
 	virtual void Process()										{ /* Do nothing here */ }
@@ -65,6 +66,7 @@ public:
 	virtual EvilNumber GetAttribute(uint32 attrID)				{ return m_Item->GetAttribute(attrID); }
 
 	//access functions
+    InventoryItemRef getItem()                                  { return m_Item; }
 	virtual uint32 itemID()										{ return m_Item->itemID(); }
 	virtual EVEItemFlags flag()									{ return m_Item->flag(); }
 	virtual uint32 typeID()										{ return m_Item->typeID(); }
