@@ -551,7 +551,6 @@ ModuleManager::ModuleManager(Ship *const ship)
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
             _fitModule( itemRef );
-        itemRef.~RefPtr();
     }
 
     for(flagIndex=flagMedSlot0; flagIndex<=flagMedSlot7; flagIndex++)
@@ -560,7 +559,6 @@ ModuleManager::ModuleManager(Ship *const ship)
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
             _fitModule( itemRef );
-        itemRef.~RefPtr();
     }
 
     for(flagIndex=flagHiSlot0; flagIndex<=flagHiSlot7; flagIndex++)
@@ -569,7 +567,6 @@ ModuleManager::ModuleManager(Ship *const ship)
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
             _fitModule( itemRef );
-        itemRef.~RefPtr();
     }
 
     for(flagIndex=flagRigSlot0; flagIndex<=flagRigSlot7; flagIndex++)
@@ -578,7 +575,6 @@ ModuleManager::ModuleManager(Ship *const ship)
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
             _fitModule( itemRef );
-        itemRef.~RefPtr();
     }
 
     for(flagIndex=flagSubSystem0; flagIndex<=flagSubSystem7; flagIndex++)
@@ -587,7 +583,6 @@ ModuleManager::ModuleManager(Ship *const ship)
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
             _fitModule( itemRef );
-        itemRef.~RefPtr();
     }
 }
 

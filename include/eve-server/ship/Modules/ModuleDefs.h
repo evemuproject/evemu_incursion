@@ -38,8 +38,23 @@ enum ModuleCommand
 	ACTIVATE,
 	DEACTIVATE,
 	OVERLOAD,   //idk if this is used yet - or what it's called :)
-	DEOVERLOAD, //idk if this is used
-    CYCLE       // used only by dgmEffectsInfo entries to indicate effects re-applied each cycle when in ACTIVATE state
+	DEOVERLOAD  //idk if this is used
+};
+
+// These are the module states where an effect will, ahem, take 'effect':
+enum ModuleEffectTriggers
+{
+    ONLINE,
+    ACTIVATE,
+    CYCLE
+};
+
+// These are the targets to which module effects are applied when activated:
+enum ModuleEffectTargets
+{
+    SELF,
+    SHIP,
+    TARGET
 };
 
 //this may or may not be redundant...idk
