@@ -44,17 +44,17 @@ enum ModuleCommand
 // These are the module states where an effect will, ahem, take 'effect':
 enum ModuleEffectTriggers
 {
-    ONLINE,
-    ACTIVATE,
-    CYCLE
+    ONLINING,       // means the effect takes effect on the target (see below) when the module goes ONLINE
+    ACTIVATING,     // means the effect takes effect on the target (see below) when the module goes to ACTIVATE
+    CYCLING         // means the effect takes effect on the target (see below) each time the module CYCLES after activation
 };
 
 // These are the targets to which module effects are applied when activated:
 enum ModuleEffectTargets
 {
-    SELF,
-    SHIP,
-    TARGET
+    SELF,           // means the target of the effect is the module's own attribute(s)
+    SHIP,           // means the target of the effect is the ship's attribute(s) to which the module is fitted
+    TARGET          // means the target of the effect is the attribute(s) of the current target of the ship to which the module is fitted
 };
 
 //this may or may not be redundant...idk
