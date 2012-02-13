@@ -23,27 +23,47 @@
 	Author:		Luck
 */
 
-#ifndef PASSIVE_MODULES_H
-#define PASSIVE_MODULES_H
 
-#include "ship/Modules/Modules.h"
-#include "ship/Modules/components/ModifyShipAttributesComponent.h"
+#include "EVEServerPCH.h"
+//#include "ship/Modules/components/ActiveModuleProcessingComponent.h"
 
-class PassiveModule : public GenericModule
+
+ActiveModuleProcessingComponent::ActiveModuleProcessingComponent(GenericModule * mod, ShipRef ship, ModifyShipAttributesComponent * shipAttrMod)
+: m_Stop( false ), m_Mod( mod ), m_Ship( ship ), m_ShipAttrModComp( shipAttrMod )
 {
-public:
-	PassiveModule(InventoryItemRef item, ShipRef ship);
-	~PassiveModule();
 
-	void Offline();
-	void Online();
+}
 
-protected:
-	ModifyShipAttributesComponent * m_ShipAttrComp;
+ActiveModuleProcessingComponent::~ActiveModuleProcessingComponent()
+{
+	//nothing to do yet
+}
 
-	//inheritance crap
-	PassiveModule() { }
+void ActiveModuleProcessingComponent::DeactivateCycle()
+{
+	m_Stop = true;
+}
 
-};
+//timing and verification function
+bool ActiveModuleProcessingComponent::ShouldProcessActiveCycle()
+{
+	//first check time for cycle timer
 
-#endif
+	//next check that we have enough capacitor avaiable
+
+	//finally check if we have been told to deactivate
+
+    return false;
+}
+
+void ActiveModuleProcessingComponent::ProcessActiveCycle()
+{
+	//check for stop signal
+	if(m_Stop)
+		return;
+
+	//else consume capacitor
+
+		
+	//then check if we are targeting another ship or not
+}

@@ -33,44 +33,14 @@ class ActiveModuleProcessingComponent
 {
 public:
 
-	ActiveModuleProcessingComponent(GenericModule * mod, ShipRef ship, ModifyShipAttributesComponent * shipAttrMod)
-	: m_Stop( false ), m_Mod( mod ), m_Ship( ship ), m_ShipAttrModComp( shipAttrMod )
-	{
+	ActiveModuleProcessingComponent(GenericModule * mod, ShipRef ship, ModifyShipAttributesComponent * shipAttrMod);
+	~ActiveModuleProcessingComponent();
 
-	}
+	void DeactivateCycle();
 
-	~ActiveModuleProcessingComponent()
-	{
-		//nothing to do yet
-	}
+	bool ShouldProcessActiveCycle();
 
-	void DeactivateCycle()
-	{
-		m_Stop = true;
-	}
-
-	//timing and verification function
-	bool ShouldProcessActiveCycle()
-	{
-		//first check time for cycle timer
-
-		//next check that we have enough capacitor avaiable
-
-		//finally check if we have been told to deactivate
-		
-	}
-
-	void ProcessActiveCycle()
-	{
-		//check for stop signal
-		if(m_Stop)
-			return;
-
-		//else consume capacitor
-
-		
-		//then check if we are targeting another ship or not
-	}
+	void ProcessActiveCycle();
 
 private:
 	//internal storage and record keeping

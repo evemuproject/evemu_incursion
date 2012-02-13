@@ -23,27 +23,30 @@
 	Author:		Luck
 */
 
-#ifndef PASSIVE_MODULES_H
-#define PASSIVE_MODULES_H
+#include "EVEServerPCH.h"
 
-#include "ship/Modules/Modules.h"
-#include "ship/Modules/components/ModifyShipAttributesComponent.h"
 
-class PassiveModule : public GenericModule
+SubSystemModule::SubSystemModule(InventoryItemRef item, ShipRef ship)
 {
-public:
-	PassiveModule(InventoryItemRef item, ShipRef ship);
-	~PassiveModule();
+	m_Item = item;
+	m_Ship = ship;
+	m_Effects = new ModuleEffects(m_Item->typeID());
+	m_ShipAttrComp = new ModifyShipAttributesComponent(this, ship);
+}
 
-	void Offline();
-	void Online();
+SubSystemModule::~SubSystemModule()
+{
+	//delete members
+	delete m_Effects;
+	delete m_ShipAttrComp;
 
-protected:
-	ModifyShipAttributesComponent * m_ShipAttrComp;
+	//null ptrs
+	m_Effects = NULL;
+	m_ShipAttrComp = NULL;
+}
 
-	//inheritance crap
-	PassiveModule() { }
-
-};
-
-#endif
+//not much to do here... hopefully there won't be
+ModulePowerLevel SubSystemModule::GetModulePowerLevel()
+{
+    return SUBSYSTEM;
+}

@@ -33,50 +33,15 @@
 class ActiveModule : public GenericModule
 {
 public:
-	ActiveModule(InventoryItemRef item, ShipRef ship)
-	{
-		m_Item = item;
-		m_Ship = ship;
-		m_Effects = new ModuleEffects(m_Item->typeID());
-		m_ShipAttrComp = new ModifyShipAttributesComponent(this, ship);
-	}
+	ActiveModule(InventoryItemRef item, ShipRef ship);
+    ~ActiveModule();
 
-	virtual ~ActiveModule() 
-	{
-		//delete members
-		delete m_Effects;
-		delete m_ShipAttrComp;
+	void Process();
+	void Offline();
+	void Online();
+	void Activate(uint32 targetID);
+	void Deactivate();
 
-		//null ptrs
-		m_Effects = NULL;
-		m_ShipAttrComp = NULL;
-	}
-
-	void Process() 
-	{
-
-	}
-
-	void Offline() 
-	{
-
-	}
-
-	void Online()
-	{
-
-	}
-
-	void Activate(uint32 targetID)
-	{
-
-	}
-
-	void Deactivate()
-	{
-
-	}
-	
 	//access functions
 	ModulePowerLevel GetModulePowerLevel()					{ return isHighPower() ? HIGH_POWER : ( isMediumPower() ? MEDIUM_POWER : LOW_POWER); }
 
@@ -92,61 +57,8 @@ protected:
 	uint32 targetID;  //passed to us by activate
 
 	//inheritance crap
-	ActiveModule() { }
+    ActiveModule() {}
 };
 
-
-class Afterburner : public ActiveModule
-{
-public:
-
-	Afterburner( InventoryItemRef item, ShipRef ship )
-	{
-		m_Item = item;
-		m_Ship = ship;
-		m_Effects = new ModuleEffects(m_Item->typeID());
-		m_ShipAttrComp = new ModifyShipAttributesComponent(this, ship);
-	}
-
-	~Afterburner()
-	{
-
-	}
-
-	 
-
-	 void Load()
-	 {
-
-	 }
-
-	 void Unload()
-	 {
-
-	 }
-
-	 void Repair()
-	 {
-
-	 }
-
-	 void Overload()
-	 {
-
-	 }
-
-	 void DeOverload()
-	 {
-
-	 }
-
-	 void DestroyRig()
-	 {
-
-	 }
-
-
-
-};
 
 #endif

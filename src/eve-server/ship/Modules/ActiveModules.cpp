@@ -23,27 +23,51 @@
 	Author:		Luck
 */
 
-#ifndef PASSIVE_MODULES_H
-#define PASSIVE_MODULES_H
 
-#include "ship/Modules/Modules.h"
-#include "ship/Modules/components/ModifyShipAttributesComponent.h"
+#include "EVEServerPCH.h"
 
-class PassiveModule : public GenericModule
+
+ActiveModule::ActiveModule(InventoryItemRef item, ShipRef ship)
 {
-public:
-	PassiveModule(InventoryItemRef item, ShipRef ship);
-	~PassiveModule();
+	m_Item = item;
+	m_Ship = ship;
+	m_Effects = new ModuleEffects(m_Item->typeID());
+	m_ShipAttrComp = new ModifyShipAttributesComponent(this, ship);
+}
 
-	void Offline();
-	void Online();
+ActiveModule::~ActiveModule() 
+{
+	//delete members
+	delete m_Effects;
+	delete m_ShipAttrComp;
 
-protected:
-	ModifyShipAttributesComponent * m_ShipAttrComp;
+	//null ptrs
+	m_Effects = NULL;
+	m_ShipAttrComp = NULL;
+}
 
-	//inheritance crap
-	PassiveModule() { }
+void ActiveModule::Process() 
+{
 
-};
+}
 
-#endif
+void ActiveModule::Offline() 
+{
+
+}
+
+void ActiveModule::Online()
+{
+
+}
+
+void ActiveModule::Activate(uint32 targetID)
+{
+
+}
+
+void ActiveModule::Deactivate()
+{
+
+}
+	

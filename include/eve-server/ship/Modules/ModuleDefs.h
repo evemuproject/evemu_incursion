@@ -70,6 +70,7 @@ enum ModulePowerLevel
 //calculation types
 enum EVECalculationType
 {
+    AUTO,
 	ADD,
 	SUBTRACT,
 	DIVIDE,

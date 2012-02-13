@@ -23,26 +23,25 @@
 	Author:		Luck
 */
 
-#ifndef PASSIVE_MODULES_H
-#define PASSIVE_MODULES_H
+#ifndef __AFTERBURNER_H__
+#define __AFTERBURNER_H__
 
-#include "ship/Modules/Modules.h"
-#include "ship/Modules/components/ModifyShipAttributesComponent.h"
 
-class PassiveModule : public GenericModule
+class Afterburner : public ActiveModule
 {
 public:
-	PassiveModule(InventoryItemRef item, ShipRef ship);
-	~PassiveModule();
 
-	void Offline();
-	void Online();
+	Afterburner( InventoryItemRef item, ShipRef ship );
+	~Afterburner();
 
-protected:
-	ModifyShipAttributesComponent * m_ShipAttrComp;
 
-	//inheritance crap
-	PassiveModule() { }
+	// Module Action Methods:
+	void Load();
+	void Unload();
+	void Repair();
+	void Overload();
+	void DeOverload();
+	void DestroyRig();
 
 };
 

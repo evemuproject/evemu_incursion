@@ -23,27 +23,52 @@
 	Author:		Luck
 */
 
-#ifndef PASSIVE_MODULES_H
-#define PASSIVE_MODULES_H
+#include "EVEServerPCH.h"
+//#include "ship/Modules/Modules.h"
+//#include "ship/Modules/components/ModifyShipAttributesComponent.h"
 
-#include "ship/Modules/Modules.h"
-#include "ship/Modules/components/ModifyShipAttributesComponent.h"
 
-class PassiveModule : public GenericModule
+PassiveModule::PassiveModule(InventoryItemRef item, ShipRef ship)
 {
-public:
-	PassiveModule(InventoryItemRef item, ShipRef ship);
-	~PassiveModule();
+	m_Item = item;
+	m_Ship = ship;
+	m_Effects = new ModuleEffects(m_Item->typeID());
+	m_ShipAttrComp = new ModifyShipAttributesComponent(this, ship);
+}
 
-	void Offline();
-	void Online();
+PassiveModule::~PassiveModule()
+{
+	//delete members
+	delete m_Effects;
+	delete m_ShipAttrComp;
 
-protected:
-	ModifyShipAttributesComponent * m_ShipAttrComp;
+	//null ptrs
+	m_Effects = NULL;
+	m_ShipAttrComp = NULL;
+}
 
-	//inheritance crap
-	PassiveModule() { }
+void PassiveModule::Offline() 
+{
+	//remove item attributes
+	m_Effects->SetDefaultEffectAsActive();
+	for(uint32 i = 0; i < m_Effects->GetSizeOfAttributeList(); i++)
+	{
+		m_ShipAttrComp->ModifyShipAttribute(m_Effects->GetTargetAttributeID(i), m_Effects->GetSourceAttributeID(i), m_Effects->GetReverseCalculationType(i));
+	}
 
-};
+	//change item state
+	m_Item->PutOffline();
+}
 
-#endif
+void PassiveModule::Online()
+{
+	//add item attributes
+	m_Effects->SetDefaultEffectAsActive();
+	for(uint32 i = 0; i < m_Effects->GetSizeOfAttributeList(); i++)
+	{
+		m_ShipAttrComp->ModifyShipAttribute(m_Effects->GetTargetAttributeID(i), m_Effects->GetSourceAttributeID(i), m_Effects->GetCalculationType(i));
+	}
+
+	//change item state
+	m_Item->PutOnline();
+}

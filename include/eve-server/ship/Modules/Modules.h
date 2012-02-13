@@ -74,6 +74,17 @@ public:
 	virtual bool isHighPower()									{ return m_Effects->isHighSlot(); }
 	virtual bool isMediumPower()								{ return m_Effects->isMediumSlot(); }
 	virtual bool isLowPower()									{ return m_Effects->isLowSlot(); }
+    virtual bool isTurretFitted()
+    {
+        // TODO: This needs to inspect the module's effects for the one called turretFitted
+        return false;
+    }
+
+    virtual bool isLauncherFitted()
+    {
+        // TODO: This needs to inspect the module's effects for the one called launcherFitted
+        return false;
+    }
 
 	virtual bool isRig() 
 	{
