@@ -438,7 +438,8 @@ void Ship::SaveShip()
 {
     sLog.Debug( "Ship::SaveShip()", "Saving all 'entity' info and attribute info to DB for ship %s (%u)...", itemName().c_str(), itemID() );
     SaveItem();
-    SaveAttributes();
+    //SaveAttributes();
+    m_ModuleManager->SaveModules();
 }
 
 bool Ship::ValidateItemSpecifics(InventoryItemRef equip) {

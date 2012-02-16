@@ -242,6 +242,41 @@ bool ModuleContainer::isSubSystem(uint32 itemID)
 	return mod->isSubSystem();
 }
 
+void ModuleContainer::SaveModules()
+{
+	uint8 r;
+	for(r = 0; r < MAX_HIGH_SLOT_COUNT; r++)
+	{
+        if( !(m_HighSlotModules[r] == NULL) )
+            m_HighSlotModules[r]->getItem()->SaveItem();
+	}
+
+	for(r = 0; r < MAX_MEDIUM_SLOT_COUNT; r++)
+	{
+        if( !(m_MediumSlotModules[r] == NULL) )
+            m_MediumSlotModules[r]->getItem()->SaveItem();
+	}
+
+	for(r = 0; r < MAX_LOW_SLOT_COUNT; r++)
+	{
+        if( !(m_LowSlotModules[r] == NULL) )
+            m_LowSlotModules[r]->getItem()->SaveItem();
+	}
+
+	for(r = 0; r < MAX_ASSEMBLY_COUNT; r++)
+	{
+        if( !(m_SubSystemModules[r] == NULL) )
+            m_SubSystemModules[r]->getItem()->SaveItem();
+	}
+
+	for(r = 0; r < MAX_RIG_COUNT; r++)
+	{
+        if( !(m_RigModules[r] == NULL) )
+            m_RigModules[r]->getItem()->SaveItem();
+	}
+
+}
+
 void ModuleContainer::_process(processType p)
 {
 	//high slots
@@ -868,6 +903,11 @@ std::vector<GenericModule *> ModuleManager::GetStackedItems(uint32 typeID, Modul
 	}
 
 	return mods;
+}
+
+void ModuleManager::SaveModules()
+{
+    m_Modules->SaveModules();
 }
 
 void ModuleManager::_processExternalEffect(SubEffect * s)

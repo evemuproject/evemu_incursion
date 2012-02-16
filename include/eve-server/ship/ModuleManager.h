@@ -66,6 +66,8 @@ public:
 	bool isRig(uint32 itemID);
 	bool isSubSystem(uint32 itemID);
 
+    void SaveModules();
+
 private:
 
 	//internal enums
@@ -249,6 +251,8 @@ public:
 	void Process();
 	void ProcessExternalEffect(Effect * e);
 	std::vector<GenericModule *> GetStackedItems(uint32 typeID, ModulePowerLevel level);  //should only be used by components
+
+    void SaveModules();
 
 private:
 	void _fitModule(InventoryItemRef item);
