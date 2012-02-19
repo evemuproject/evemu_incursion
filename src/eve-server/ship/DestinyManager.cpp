@@ -1174,12 +1174,16 @@ PyResult DestinyManager::AttemptDockOperation()
 	GVector direction(start, end);
     double rangeToStation = direction.length();
 
-    GotoDirection( direction, true );   // Turn ship and move toward docking point
+    // WARNING: DO NOT uncomment the following line as it for some reason causes HEAP corruption to occur on auto-docking
+    //if( !(who->GetPendingDockOperation()) )
+        GotoDirection( direction, true );   // Turn ship and move toward docking point
 
     // Verify range to station is within docking perimeter of 500 meters:
+    // (there is something WRONG with this as it will become true even when the client says ship is still about 14km from station)
     if( (rangeToStation - station->GetRadius()) > 500 )
     {
-        who->SetPendingDockOperation( true );   // Set client object into state that a Docking operation is pending
+        // WARNING: DO NOT uncomment the following line as it for some reason causes HEAP corruption to occur on auto-docking
+        //who->SetPendingDockOperation( true );   // Set client object into state that a Docking operation is pending
         return NULL;                            // so that DestinyManager can track when it needs to auto-dock
     }
     // This packet has to be returned to the client when outside the docking perimeter
