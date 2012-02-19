@@ -437,9 +437,9 @@ bool Ship::ValidateBoardShip(ShipRef ship, CharacterRef character)
 void Ship::SaveShip()
 {
     sLog.Debug( "Ship::SaveShip()", "Saving all 'entity' info and attribute info to DB for ship %s (%u)...", itemName().c_str(), itemID() );
-    SaveItem();
-    //SaveAttributes();
-    //m_ModuleManager->SaveModules();
+
+    SaveItem();                         // Save all attributes and item info
+    m_ModuleManager->SaveModules();     // Save all attributes and item info for all modules fitted to this ship
 }
 
 bool Ship::ValidateItemSpecifics(InventoryItemRef equip) {

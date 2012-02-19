@@ -1257,6 +1257,10 @@ PyResult DestinyManager::AttemptDockOperation()
 
 	}
 
+    // Save all Character, Ship, Module data to Database on dock:
+    if( who->IsClient() )
+        who->CastToClient()->SaveAllToDatabase();
+
     // Docking was accepted, so send the OnDockingAccepted packet:
     // Packet::Notification
     /* -- In the marshalstream:
