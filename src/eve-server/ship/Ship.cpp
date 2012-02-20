@@ -242,7 +242,7 @@ void Ship::ValidateAddItem(EVEItemFlags flag, InventoryItemRef item)
 		if( capacityUsed + item->GetAttribute(AttrVolume) > m_pOperator->GetShip()->GetAttribute(AttrCapacity) )    // Operator assumed to be Client *
 			throw PyException( MakeCustomError( "Not enough cargo space!") );
 	}
-	else if( flag > flagLowSlot0  &&  flag < flagHiSlot7 )
+	else if( (flag >= flagLowSlot0)  &&  (flag <= flagHiSlot7) )
 	{
         if( m_pOperator->IsClient() )
 		    if(!Skill::FitModuleSkillCheck(item, character))        // SKIP THIS SKILL CHECK if Operator is NOT Client *
@@ -258,7 +258,7 @@ void Ship::ValidateAddItem(EVEItemFlags flag, InventoryItemRef item)
 				throw PyException( MakeCustomError( "Incorrect charge type for this module.") );
 		}
 	}
-	else if( flag > flagRigSlot0  &&  flag < flagRigSlot7 )
+	else if( (flag >= flagRigSlot0)  &&  (flag <= flagRigSlot7) )
 	{
         if( m_pOperator->IsClient() )
     		if(!Skill::FitModuleSkillCheck(item, character))        // SKIP THIS SKILL CHECK if Operator is NOT Client *
@@ -268,13 +268,12 @@ void Ship::ValidateAddItem(EVEItemFlags flag, InventoryItemRef item)
 		if( m_pOperator->GetShip()->GetAttribute(AttrUpgradeLoad) + item->GetAttribute(AttrUpgradeCost) > m_pOperator->GetShip()->GetAttribute(AttrUpgradeCapacity) )   // Operator assumed to be Client *
 			throw PyException( MakeCustomError( "Your ship cannot handle the extra calibration" ) );
 	}
-	else if( flag > flagSubSystem0  &&  flag < flagSubSystem7 )
+	else if( (flag >= flagSubSystem0)  &&  (flag <= flagSubSystem7) )
 	{
         if( m_pOperator->IsClient() )
 		    if(!Skill::FitModuleSkillCheck(item, character))        // SKIP THIS SKILL CHECK if Operator is NOT Client *
 			    throw PyException( MakeCustomError( "You do not have the required skills to fit this \n%s", item->itemName().c_str() ) );
 	}
-	
 }
 
 PyObject *Ship::ShipGetInfo()

@@ -112,12 +112,12 @@ void MEffect::Populate(uint32 effectID)
 
 	while( res->GetRow(row2) )
 	{
-		m_TargetAttributeIDs[count] = row2.GetInt(1);
-		m_SourceAttributeIDs[count] = row2.GetInt(2);
-		m_CalculationTypeID[count] = row2.GetInt(3);
-		m_ReverseCalculationTypeID[count] = row2.GetInt(4);
-        m_EffectAppliedWhenIDs[count] = row2.GetInt(5);
-        m_EffectAppliedTargetIDs[count] = row2.GetInt(6);
+		m_TargetAttributeIDs[count] = row2.GetInt(0);
+		m_SourceAttributeIDs[count] = row2.GetInt(1);
+		m_CalculationTypeID[count] = row2.GetInt(2);
+		m_ReverseCalculationTypeID[count] = row2.GetInt(3);
+        m_EffectAppliedWhenIDs[count] = row2.GetInt(4);
+        m_EffectAppliedTargetIDs[count] = row2.GetInt(5);
 		count++;
 	}
 
