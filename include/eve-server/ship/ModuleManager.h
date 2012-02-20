@@ -31,6 +31,7 @@ class InventoryItem;
 class GenericModule;
 class SystemEntity;
 class Client;
+class ModuleManager;
 
 #include "ship/Modules/Modules.h"
 #include "ship/Modules/ModuleDefs.h"
@@ -41,7 +42,7 @@ class Client;
 class ModuleContainer
 {
 public:
-	ModuleContainer(uint32 lowSlots, uint32 medSlots, uint32 highSlots, uint32 rigSlots, uint32 subSystemSlots);
+	ModuleContainer(uint32 lowSlots, uint32 medSlots, uint32 highSlots, uint32 rigSlots, uint32 subSystemSlots, ModuleManager * myManager);
 	~ModuleContainer();
 
 	void AddModule(uint32 flag, GenericModule * mod);
@@ -135,6 +136,7 @@ private:
 	uint32 m_RigSlots;
 	uint32 m_SubSystemSlots;
 
+    ModuleManager * m_MyManager;        // we do not own this
 };
 
 #pragma endregion
@@ -273,8 +275,6 @@ private:
 
 	//modules storage, we own this
 	ModuleContainer * m_Modules;
-
-
 };
 
 #pragma endregion

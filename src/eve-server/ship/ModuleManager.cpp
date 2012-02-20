@@ -28,7 +28,7 @@
 
 //ModuleContainer class definitions
 #pragma region ModuleContainerClass
-ModuleContainer::ModuleContainer(uint32 lowSlots, uint32 medSlots, uint32 highSlots, uint32 rigSlots, uint32 subSystemSlots)
+ModuleContainer::ModuleContainer(uint32 lowSlots, uint32 medSlots, uint32 highSlots, uint32 rigSlots, uint32 subSystemSlots, ModuleManager * myManager)
 {
 	m_LowSlots = lowSlots;
 	m_MediumSlots = medSlots;
@@ -37,6 +37,8 @@ ModuleContainer::ModuleContainer(uint32 lowSlots, uint32 medSlots, uint32 highSl
 	m_SubSystemSlots = subSystemSlots;
 
 	_initializeModuleContainers();
+
+    m_MyManager = myManager;
 }
 
 ModuleContainer::~ModuleContainer()
@@ -367,9 +369,10 @@ void ModuleContainer::_processEx(processType p, slotType t)
 			if(*cur == NULL)
 				continue;
 
-			(*cur)->Process();
+            (*cur)->Process();
 		}
-		break;
+
+        break;
 	}
 }
 
@@ -573,7 +576,8 @@ ModuleManager::ModuleManager(Ship *const ship)
 									(uint32)ship->GetAttribute(AttrMedSlots).get_int(),
 									(uint32)ship->GetAttribute(AttrHiSlots).get_int(),
 									(uint32)ship->GetAttribute(AttrRigSlots).get_int(),
-									(uint32)ship->GetAttribute(AttrSubSystemSlot).get_int());
+									(uint32)ship->GetAttribute(AttrSubSystemSlot).get_int(),
+                                    this);
 
     // Store reference to the Ship object to which the ModuleManager belongs:
 	m_Ship = ship;
