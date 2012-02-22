@@ -632,6 +632,14 @@ ModuleManager::~ModuleManager()
 	m_Modules = NULL;
 }
 
+bool ModuleManager::IsSlotOccupied(uint32 flag)
+{
+    if( this->m_Modules->GetModule(EVEItemFlags(flag)) == NULL )
+        return false;
+    else
+        return true;
+}
+
 void ModuleManager::_SendInfoMessage(const char *fmt, ...)
 {
     if( m_Ship->GetOperator() == NULL )     // Operator assumed to be Client *

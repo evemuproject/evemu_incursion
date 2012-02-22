@@ -227,6 +227,8 @@ public:
 	ModuleManager(Ship *const ship);
 	~ModuleManager();
 
+    bool IsSlotOccupied(uint32 flag);
+
 	void InstallRig(InventoryItemRef item);
 	void UninstallRig(uint32 itemID);
 	void InstallSubSystem(InventoryItemRef item);

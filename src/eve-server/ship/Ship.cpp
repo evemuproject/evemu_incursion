@@ -249,6 +249,8 @@ void Ship::ValidateAddItem(EVEItemFlags flag, InventoryItemRef item)
 			    throw PyException( MakeCustomError( "You do not have the required skills to fit this \n%s", item->itemName().c_str() ) );
 		if(!ValidateItemSpecifics(item))
 			throw PyException( MakeCustomError( "Your ship cannot equip this module" ) );
+        if( m_ModuleManager->IsSlotOccupied(flag) )
+            throw PyException( MakeUserError( "SlotAlreadyOccupied" ) );
 		if(item->categoryID() == EVEDB::invCategories::Charge) {
 			InventoryItemRef module;
 			m_pOperator->GetShip()->FindSingleByFlag(flag, module);     // Operator assumed to be Client *
