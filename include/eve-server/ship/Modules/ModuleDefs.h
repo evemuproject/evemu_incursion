@@ -44,10 +44,11 @@ enum ModuleCommand
 // These are the module states where an effect will, ahem, take 'effect':
 enum ModuleEffectTriggers
 {
-    ONLINING,       // means the effect takes effect on the target (see below) when the module goes ONLINE
-    ACTIVATING,     // means the effect takes effect on the target (see below) when the module goes to ACTIVATE
-    CYCLING         // means the effect takes effect on the target (see below) each time the module CYCLES after activation
-};
+    ONLINING,       // means the effect takes effect on the target (see below) upon entering the ONLINE state
+    ACTIVATING,     // used only for ACTIVE modules with NO duration attribute; means the effect takes effect on the
+                    // target (see below) upon entering the ACTIVATE state
+    CYCLING         // used only for modules with A duration attribute; means the effect takes effect on the
+};                  //  target (see below) one extra time when in ACTIVATE state after each CYCLE duration expires
 
 // These are the targets to which module effects are applied when activated:
 enum ModuleEffectTargets
