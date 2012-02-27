@@ -41,6 +41,9 @@ ModuleContainer::ModuleContainer(uint32 lowSlots, uint32 medSlots, uint32 highSl
 
 	_initializeModuleContainers();
 
+    m_TotalTurretsFitted = 0;
+    m_TotalLaunchersFitted = 0;
+
     m_MyManager = myManager;
 }
 
@@ -88,6 +91,12 @@ void ModuleContainer::AddModule(uint32 flag, GenericModule * mod)
 	case slotTypeMedPower:		_addMediumSlotModule(flag, mod);			break;
 	case slotTypeHiPower:		_addHighSlotModule(flag, mod);				break;
 	}
+
+    // Maintain Turret and Launcher Fitted module counts:
+    if( mod->isTurretFitted() )
+        m_TotalTurretsFitted++;
+    if( mod->isLauncherFitted() )
+        m_TotalLaunchersFitted++;
 
     // Maintain the Modules Fitted By Group counter for this module group:
     if( m_ModulesFittedByGroupID.find(mod->getItem()->groupID()) != m_ModulesFittedByGroupID.end() )
@@ -293,6 +302,12 @@ void ModuleContainer::_removeModule(EVEItemFlags flag, GenericModule * mod)
 	case slotTypeMedPower:		_removeMediumSlotModule(flag);				break;
 	case slotTypeHiPower:		_removeHighSlotModule(flag);				break;
 	}
+
+    // Maintain Turret and Launcher Fitted module counts:
+    if( mod->isTurretFitted() )
+        m_TotalTurretsFitted--;
+    if( mod->isLauncherFitted() )
+        m_TotalLaunchersFitted--;
 
     // Maintain the Modules Fitted By Group counter for this module group:
     if( m_ModulesFittedByGroupID.find(mod->getItem()->groupID()) != m_ModulesFittedByGroupID.end() )
@@ -726,41 +741,10 @@ void ModuleManager::FitModule(InventoryItemRef item)
 {
 	if(item->categoryID() == EVEDB::invCategories::Module)
     {
-        // Check for max turret modules allowed:
-        if( ? )
-        {
-            //std::map<std::string, PyRep *> args;
-            //args["typename"] = new PyString(item->itemName().c_str());
-            //args["portion"] = new PyInt(item->type().portionSize());
-
-            throw PyException( MakeUserError( "NotEnoughTurretSlots" ) );
-        }
-        // Check for max launcher modules allowed:
-        else if( ? )
-        {
-            //std::map<std::string, PyRep *> args;
-            //args["typename"] = new PyString(item->itemName().c_str());
-            //args["portion"] = new PyInt(item->type().portionSize());
-
-            throw PyException( MakeUserError( "NotEnoughLauncherSlots" ) );
-        }
-        // Check for max modules of group allowed:
-        else if( ? )
-        {
-            //std::map<std::string, PyRep *> args;
-            //args["typename"] = new PyString(item->itemName().c_str());
-            //args["portion"] = new PyInt(item->type().portionSize());
-
-            throw PyException( MakeUserError( "CantFitTooManyByGroup" ) );
-        }
-        else
-        {
-            // Fit Module now that all checks have passed:
-		    _fitModule(item);
-
+        // Attempt to fit the module
+		if( _fitModule(item) )
             // Now that module is successfully fitted, attempt to put it Online:
             Online(item->itemID());
-        }
     }
 	else
 		sLog.Debug("ModuleManager","%s tried to fit item %u, which is not a module", m_Ship->GetOperator()->GetName(), item->itemID());
@@ -776,11 +760,54 @@ void ModuleManager::UnfitModule(uint32 itemID)
 	}
 }
 
-void ModuleManager::_fitModule(InventoryItemRef item)
+bool ModuleManager::_fitModule(InventoryItemRef item)
 {
+    bool verifyFailed = false;
 	GenericModule * mod = ModuleFactory(item, ShipRef(m_Ship));
 
-	m_Modules->AddModule(mod->flag(), mod);
+    // Check for max turret modules allowed:
+    if( mod->isTurretFitted() && (m_Modules->GetFittedTurretCount() == m_Ship->GetMaxTurrentHardpoints().get_int()) )
+    {
+        //std::map<std::string, PyRep *> args;
+        //args["typename"] = new PyString(item->itemName().c_str());
+        //args["portion"] = new PyInt(item->type().portionSize());
+
+        throw PyException( MakeUserError( "NotEnoughTurretSlots" ) );
+        verifyFailed = true;
+    }
+    // Check for max launcher modules allowed:
+    if( mod->isLauncherFitted() && (m_Modules->GetFittedLauncherCount() == m_Ship->GetMaxLauncherHardpoints().get_int()) )
+    {
+        //std::map<std::string, PyRep *> args;
+        //args["typename"] = new PyString(item->itemName().c_str());
+        //args["portion"] = new PyInt(item->type().portionSize());
+
+        throw PyException( MakeUserError( "NotEnoughLauncherSlots" ) );
+        verifyFailed = true;
+    }
+    // Check for max modules of group allowed:
+    else if( m_Modules->GetFittedModuleCountByGroup(item->groupID()) == mod->getItem()->GetAttribute(AttrMaxGroupFitted).get_int() )
+    {
+        //std::map<std::string, PyRep *> args;
+        //args["typename"] = new PyString(item->itemName().c_str());
+        //args["portion"] = new PyInt(item->type().portionSize());
+
+        throw PyException( MakeUserError( "CantFitTooManyByGroup" ) );
+        verifyFailed = true;
+    }
+    else
+    {
+        // Fit Module now that all checks have passed:
+        m_Modules->AddModule(mod->flag(), mod);
+    }
+
+    if( verifyFailed )
+    {
+        delete mod;
+        return false;
+    }
+    else
+        return true;
 }
 
 void ModuleManager::Online(uint32 itemID)

@@ -68,6 +68,8 @@ public:
 	bool isRig(uint32 itemID);
 	bool isSubSystem(uint32 itemID);
 
+    uint32 GetFittedTurretCount() { return m_TotalTurretsFitted; }
+    uint32 GetFittedLauncherCount() { return m_TotalLaunchersFitted; }
     uint32 GetFittedModuleCountByGroup(uint32 groupID);
 
     void SaveModules();
@@ -141,6 +143,8 @@ private:
     uint32 m_TurretSlots;
     uint32 m_LauncherSlots;
 
+    uint32 m_TotalTurretsFitted;
+    uint32 m_TotalLaunchersFitted;
     std::map<uint32, uint32> m_ModulesFittedByGroupID;
 
     ModuleManager * m_MyManager;        // we do not own this
@@ -266,7 +270,7 @@ public:
     void SaveModules();
 
 private:
-	void _fitModule(InventoryItemRef item);
+	bool _fitModule(InventoryItemRef item);
 
 	void _processExternalEffect(SubEffect * e);
 

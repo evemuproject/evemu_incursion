@@ -517,6 +517,8 @@ void Ship::AddItem(EVEItemFlags flag, InventoryItemRef item)
 
 	item->Move(m_pOperator->GetLocationID(), flag);  //TODO - check this
 
+    // TODO: Somehow, if this returns FALSE, the item->Move() above has to be "undone"... can we do the move AFTER attempting to fit?
+    // what if we pass the flag into FitModule().... then if it returns true, the item->Move() can be called
 	m_ModuleManager->FitModule(item);
 }
 

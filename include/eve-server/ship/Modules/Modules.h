@@ -74,16 +74,23 @@ public:
 	virtual bool isHighPower()									{ return m_Effects->isHighSlot(); }
 	virtual bool isMediumPower()								{ return m_Effects->isMediumSlot(); }
 	virtual bool isLowPower()									{ return m_Effects->isLowSlot(); }
+
     virtual bool isTurretFitted()
     {
-        // TODO: This needs to inspect the module's effects for the one called turretFitted
-        return false;
+        // Try to make the effect called 'turretFitted' active, if it exists, to test for module being a turret:
+        if( m_Effects->SetActiveEffect(42) )
+            return true;
+        else
+            return false;
     }
 
     virtual bool isLauncherFitted()
     {
-        // TODO: This needs to inspect the module's effects for the one called launcherFitted
-        return false;
+        // Try to make the effect called 'launcherFitted' active, if it exists, to test for module being a launcher:
+        if( m_Effects->SetActiveEffect(40) )
+            return true;
+        else
+            return false;
     }
 
 	virtual bool isRig() 
