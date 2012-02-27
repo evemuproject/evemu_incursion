@@ -28,13 +28,16 @@
 
 //ModuleContainer class definitions
 #pragma region ModuleContainerClass
-ModuleContainer::ModuleContainer(uint32 lowSlots, uint32 medSlots, uint32 highSlots, uint32 rigSlots, uint32 subSystemSlots, ModuleManager * myManager)
+ModuleContainer::ModuleContainer(uint32 lowSlots, uint32 medSlots, uint32 highSlots, uint32 rigSlots, uint32 subSystemSlots,
+    uint32 turretSlots, uint32 launcherSlots, ModuleManager * myManager)
 {
 	m_LowSlots = lowSlots;
 	m_MediumSlots = medSlots;
 	m_HighSlots = highSlots;
 	m_RigSlots = rigSlots;
 	m_SubSystemSlots = subSystemSlots;
+    m_TurretSlots = turretSlots;
+    m_LauncherSlots = launcherSlots;
 
 	_initializeModuleContainers();
 
@@ -78,7 +81,7 @@ void ModuleContainer::AddModule(uint32 flag, GenericModule * mod)
 {
 	switch(_checkBounds(flag))
 	{
-	case NaT:					sLog.Error("AddModule","Out of bounds");	break; 
+    case NaT:					sLog.Error("ModuleContainer::AddModule()","Flag Out of bounds");	break; 
 	case slotTypeSubSystem:		_addSubSystemModule(flag, mod);				break;
 	case slotTypeRig:			_addRigModule(flag, mod);					break;
 	case slotTypeLowPower:		_addLowSlotModule(flag, mod);				break;
@@ -86,14 +89,18 @@ void ModuleContainer::AddModule(uint32 flag, GenericModule * mod)
 	case slotTypeHiPower:		_addHighSlotModule(flag, mod);				break;
 	}
 
-
+    // Maintain the Modules Fitted By Group counter for this module group:
+    if( m_ModulesFittedByGroupID.find(mod->getItem()->groupID()) != m_ModulesFittedByGroupID.end() )
+        m_ModulesFittedByGroupID.find(mod->getItem()->groupID())->second += 1;
+    else
+        m_ModulesFittedByGroupID.insert(std::pair<uint32,uint32>(mod->getItem()->groupID(), 1));
 }
 
 void ModuleContainer::RemoveModule(EVEItemFlags flag)
 {
 	GenericModule * mod = GetModule(flag);
 
-	_removeModule(mod->flag());
+	_removeModule(mod->flag(), mod);
 
 	//delete the module
 	delete mod;
@@ -104,7 +111,7 @@ void ModuleContainer::RemoveModule(uint32 itemID)
 {
 	GenericModule * mod = GetModule(itemID);
 
-	_removeModule(mod->flag());
+	_removeModule(mod->flag(), mod);
 
 	//delete the module
 	delete mod;
@@ -115,7 +122,7 @@ GenericModule * ModuleContainer::GetModule(EVEItemFlags flag)
 {
 	switch(_checkBounds(flag))
 	{
-	case NaT:					sLog.Error("AddModule","Out of bounds");	break; 
+    case NaT:					sLog.Error("ModuleContainer::AddModule()","Flag Out of bounds");	break; 
 	case slotTypeSubSystem:		return _getSubSystemModule(flag);			break;
 	case slotTypeRig:			return _getRigModule(flag);					break;
 	case slotTypeLowPower:		return _getLowSlotModule(flag);				break;
@@ -165,22 +172,9 @@ GenericModule * ModuleContainer::GetModule(uint32 itemID)
 			    return m_RigModules[r];
 	}
 
-	sLog.Warning("ModuleContainer","Search for itemID: %u yielded no results", itemID);
+	sLog.Warning("ModuleContainer::GetModule()","Search for itemID: %u yielded no results", itemID);
 
 	return NULL;  //we don't
-}
-
-void ModuleContainer::_removeModule(EVEItemFlags flag)
-{
-	switch(_checkBounds(flag))
-	{
-	case NaT:					sLog.Error("AddModule","Out of bounds");	break; 
-	case slotTypeSubSystem:		_removeSubSystemModule(flag);				break;
-	case slotTypeRig:			_removeRigSlotModule(flag);					break;
-	case slotTypeLowPower:		_removeLowSlotModule(flag);					break;
-	case slotTypeMedPower:		_removeMediumSlotModule(flag);				break;
-	case slotTypeHiPower:		_removeHighSlotModule(flag);				break;
-	}
 }
 
 
@@ -244,6 +238,15 @@ bool ModuleContainer::isSubSystem(uint32 itemID)
 	return mod->isSubSystem();
 }
 
+uint32 ModuleContainer::GetFittedModuleCountByGroup(uint32 groupID)
+{
+    uint32 moduleCountByGroup = 0;
+    if( m_ModulesFittedByGroupID.find(groupID) == m_ModulesFittedByGroupID.end() )
+        return 0;
+    else
+        return m_ModulesFittedByGroupID.find(groupID)->second;
+}
+
 void ModuleContainer::SaveModules()
 {
 	uint8 r;
@@ -277,6 +280,33 @@ void ModuleContainer::SaveModules()
             m_RigModules[r]->getItem()->SaveItem();
 	}
 
+}
+
+void ModuleContainer::_removeModule(EVEItemFlags flag, GenericModule * mod)
+{
+    switch(_checkBounds(flag))
+	{
+    case NaT:					sLog.Error("ModuleContainer::_removeModule()","Flag Out of bounds");	break; 
+	case slotTypeSubSystem:		_removeSubSystemModule(flag);				break;
+	case slotTypeRig:			_removeRigSlotModule(flag);					break;
+	case slotTypeLowPower:		_removeLowSlotModule(flag);					break;
+	case slotTypeMedPower:		_removeMediumSlotModule(flag);				break;
+	case slotTypeHiPower:		_removeHighSlotModule(flag);				break;
+	}
+
+    // Maintain the Modules Fitted By Group counter for this module group:
+    if( m_ModulesFittedByGroupID.find(mod->getItem()->groupID()) != m_ModulesFittedByGroupID.end() )
+    {
+        uint32 moduleCount = 0;
+        if( (moduleCount = m_ModulesFittedByGroupID.find(mod->getItem()->groupID())->second) > 1)
+            // We still have more than one module of this group fitted, so just reduce number fitted by 1:
+            m_ModulesFittedByGroupID.find(mod->getItem()->groupID())->second -= 1;
+        else
+            // This was the last module of this group fitted, so remove the entry from the map:
+            m_ModulesFittedByGroupID.erase(mod->getItem()->groupID());
+    }
+    else
+        sLog.Error( "ModuleContainer::_removeModule()", "Removing Module from ship fit when it had NO entry in m_ModulesFittedByGroup !" );
 }
 
 void ModuleContainer::_process(processType p)
@@ -482,7 +512,7 @@ bool ModuleContainer::_isLowSlot(uint32 flag)
 		if( (flag - flagLowSlot0) < m_LowSlots )
 			return true;
 		else
-			sLog.Error("_isLowSlot", "this shouldn't happen");
+			sLog.Error("ModuleContainer::_isLowSlot()", "this shouldn't happen");
 	}
 
 	return false;
@@ -495,7 +525,7 @@ bool ModuleContainer::_isMediumSlot(uint32 flag)
 		if( (flag - flagMedSlot0) < m_MediumSlots )
 			return true;
 		else
-			sLog.Error("_isMediumSlot", "this shouldn't happen");
+			sLog.Error("ModuleContainer::_isMediumSlot()", "this shouldn't happen");
 	}
 
 	return false;
@@ -508,7 +538,7 @@ bool ModuleContainer::_isHighSlot(uint32 flag)
 		if( (flag - flagHiSlot0) < m_HighSlots )
 			return true;
 		else
-			sLog.Error("_isHighSlot", "this shouldn't happen");
+			sLog.Error("ModuleContainer::_isHighSlot()", "this shouldn't happen");
 	}
 
 	return false;
@@ -521,7 +551,7 @@ bool ModuleContainer::_isRigSlot(uint32 flag)
 		if( (flag - flagRigSlot0) < m_RigSlots )
 			return true;
 		else
-			sLog.Error("_isRigSlot", "this shouldn't happen");
+			sLog.Error("ModuleContainer::_isRigSlot()", "this shouldn't happen");
 	}
 
 	return false;
@@ -534,7 +564,7 @@ bool ModuleContainer::_isSubSystemSlot(uint32 flag)
 		if( (flag - flagSubSystem0) < m_SubSystemSlots )
 			return true;
 		else
-			sLog.Error("_isSubSystemSlot", "this shouldn't happen");
+			sLog.Error("ModuleContainer::_isSubSystemSlot()", "this shouldn't happen");
 	}
 
 	return false;
@@ -577,6 +607,8 @@ ModuleManager::ModuleManager(Ship *const ship)
 									(uint32)ship->GetAttribute(AttrHiSlots).get_int(),
 									(uint32)ship->GetAttribute(AttrRigSlots).get_int(),
 									(uint32)ship->GetAttribute(AttrSubSystemSlot).get_int(),
+                                    (uint32)ship->GetAttribute(AttrTurretSlotsLeft).get_int(),
+                                    (uint32)ship->GetAttribute(AttrLauncherSlotsLeft).get_int(),
                                     this);
 
     // Store reference to the Ship object to which the ModuleManager belongs:
@@ -693,12 +725,45 @@ void ModuleManager::SwapSubSystem(InventoryItemRef item)
 void ModuleManager::FitModule(InventoryItemRef item)
 {
 	if(item->categoryID() == EVEDB::invCategories::Module)
-		_fitModule(item);
+    {
+        // Check for max turret modules allowed:
+        if( ? )
+        {
+            //std::map<std::string, PyRep *> args;
+            //args["typename"] = new PyString(item->itemName().c_str());
+            //args["portion"] = new PyInt(item->type().portionSize());
+
+            throw PyException( MakeUserError( "NotEnoughTurretSlots" ) );
+        }
+        // Check for max launcher modules allowed:
+        else if( ? )
+        {
+            //std::map<std::string, PyRep *> args;
+            //args["typename"] = new PyString(item->itemName().c_str());
+            //args["portion"] = new PyInt(item->type().portionSize());
+
+            throw PyException( MakeUserError( "NotEnoughLauncherSlots" ) );
+        }
+        // Check for max modules of group allowed:
+        else if( ? )
+        {
+            //std::map<std::string, PyRep *> args;
+            //args["typename"] = new PyString(item->itemName().c_str());
+            //args["portion"] = new PyInt(item->type().portionSize());
+
+            throw PyException( MakeUserError( "CantFitTooManyByGroup" ) );
+        }
+        else
+        {
+            // Fit Module now that all checks have passed:
+		    _fitModule(item);
+
+            // Now that module is successfully fitted, attempt to put it Online:
+            Online(item->itemID());
+        }
+    }
 	else
 		sLog.Debug("ModuleManager","%s tried to fit item %u, which is not a module", m_Ship->GetOperator()->GetName(), item->itemID());
-
-    // Now that module is successfully fitted, put it online, if it can be:
-    Online(item->itemID());
 }
 
 void ModuleManager::UnfitModule(uint32 itemID)

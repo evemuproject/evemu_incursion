@@ -42,7 +42,8 @@ class ModuleManager;
 class ModuleContainer
 {
 public:
-	ModuleContainer(uint32 lowSlots, uint32 medSlots, uint32 highSlots, uint32 rigSlots, uint32 subSystemSlots, ModuleManager * myManager);
+	ModuleContainer(uint32 lowSlots, uint32 medSlots, uint32 highSlots, uint32 rigSlots, uint32 subSystemSlots,
+        uint32 turretSlots, uint32 launcherSlots, ModuleManager * myManager);
 	~ModuleContainer();
 
 	void AddModule(uint32 flag, GenericModule * mod);
@@ -67,6 +68,8 @@ public:
 	bool isRig(uint32 itemID);
 	bool isSubSystem(uint32 itemID);
 
+    uint32 GetFittedModuleCountByGroup(uint32 groupID);
+
     void SaveModules();
 
 private:
@@ -90,7 +93,7 @@ private:
 		subSystemSlot
 	};
 
-	void _removeModule(EVEItemFlags flag);
+	void _removeModule(EVEItemFlags flag, GenericModule * mod);
 
 	void _process(processType p);
 	void _processEx(processType p, slotType t);
@@ -135,6 +138,10 @@ private:
 	uint32 m_HighSlots;
 	uint32 m_RigSlots;
 	uint32 m_SubSystemSlots;
+    uint32 m_TurretSlots;
+    uint32 m_LauncherSlots;
+
+    std::map<uint32, uint32> m_ModulesFittedByGroupID;
 
     ModuleManager * m_MyManager;        // we do not own this
 };

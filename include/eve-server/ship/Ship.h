@@ -221,6 +221,8 @@ public:
 
 	/* begin new module manager interface */
     uint32 FindAvailableModuleSlot( InventoryItemRef item );
+    EvilNumber GetMaxTurrentHardpoints() { return GetAttribute(AttrTurretSlotsLeft); }
+    EvilNumber GetMaxLauncherHardpoints() { return GetAttribute(AttrLauncherSlotsLeft); }
 	void AddItem( EVEItemFlags flag, InventoryItemRef item);
 	void RemoveItem( InventoryItemRef item, uint32 inventoryID, EVEItemFlags flag );
 	void UpdateModules();
