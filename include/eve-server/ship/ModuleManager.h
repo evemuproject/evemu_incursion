@@ -100,12 +100,6 @@ private:
 	void _process(processType p);
 	void _processEx(processType p, slotType t);
 
-	void _addHighSlotModule(uint32 flag, GenericModule * mod);
-	void _addMediumSlotModule(uint32 flag, GenericModule * mod);
-	void _addLowSlotModule(uint32 flag, GenericModule * mod);
-	void _addRigModule(uint32 flag, GenericModule * mod);
-	void _addSubSystemModule(uint32 flag, GenericModule * mod);
-
 	GenericModule * _getHighSlotModule(uint32 flag);
 	GenericModule * _getMediumSlotModule(uint32 flag);
 	GenericModule * _getLowSlotModule(uint32 flag);
@@ -240,11 +234,11 @@ public:
 
     bool IsSlotOccupied(uint32 flag);
 
-	void InstallRig(InventoryItemRef item);
+	bool InstallRig(InventoryItemRef item, EVEItemFlags flag);
 	void UninstallRig(uint32 itemID);
-	void InstallSubSystem(InventoryItemRef item);
-	void SwapSubSystem(InventoryItemRef item);
-	void FitModule(InventoryItemRef item);
+	bool InstallSubSystem(InventoryItemRef item, EVEItemFlags flag);
+	bool SwapSubSystem(InventoryItemRef item, EVEItemFlags flag);
+	bool FitModule(InventoryItemRef item, EVEItemFlags flag);
 	void UnfitModule(uint32 itemID);
 	void Online(uint32 itemID);
 	void OnlineAll();
@@ -270,7 +264,7 @@ public:
     void SaveModules();
 
 private:
-	bool _fitModule(InventoryItemRef item);
+	bool _fitModule(InventoryItemRef item, EVEItemFlags flag);
 
 	void _processExternalEffect(SubEffect * e);
 

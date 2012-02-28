@@ -84,12 +84,24 @@ void ModuleContainer::AddModule(uint32 flag, GenericModule * mod)
 {
 	switch(_checkBounds(flag))
 	{
-    case NaT:					sLog.Error("ModuleContainer::AddModule()","Flag Out of bounds");	break; 
-	case slotTypeSubSystem:		_addSubSystemModule(flag, mod);				break;
-	case slotTypeRig:			_addRigModule(flag, mod);					break;
-	case slotTypeLowPower:		_addLowSlotModule(flag, mod);				break;
-	case slotTypeMedPower:		_addMediumSlotModule(flag, mod);			break;
-	case slotTypeHiPower:		_addHighSlotModule(flag, mod);				break;
+        case NaT:
+            sLog.Error("ModuleContainer::AddModule()","Flag Out of bounds");
+            break;
+	    case slotTypeSubSystem:
+            m_SubSystemModules[flag - flagSubSystem0] = mod;
+            break;
+	    case slotTypeRig:
+            m_RigModules[flag - flagRigSlot0] = mod;
+            break;
+	    case slotTypeLowPower:
+            m_LowSlotModules[flag - flagLowSlot0] = mod;
+            break;
+	    case slotTypeMedPower:
+            m_MediumSlotModules[flag - flagMedSlot0] = mod;
+            break;
+	    case slotTypeHiPower:
+            m_HighSlotModules[flag - flagHiSlot0] = mod;
+            break;
 	}
 
     // Maintain Turret and Launcher Fitted module counts:
@@ -131,12 +143,24 @@ GenericModule * ModuleContainer::GetModule(EVEItemFlags flag)
 {
 	switch(_checkBounds(flag))
 	{
-    case NaT:					sLog.Error("ModuleContainer::AddModule()","Flag Out of bounds");	break; 
-	case slotTypeSubSystem:		return _getSubSystemModule(flag);			break;
-	case slotTypeRig:			return _getRigModule(flag);					break;
-	case slotTypeLowPower:		return _getLowSlotModule(flag);				break;
-	case slotTypeMedPower:		return _getMediumSlotModule(flag);			break;
-	case slotTypeHiPower:		return _getHighSlotModule(flag);			break;					
+        case NaT:
+            sLog.Error("ModuleContainer::AddModule()","Flag Out of bounds");
+            break; 
+	    case slotTypeSubSystem:
+            return m_SubSystemModules[flag - flagSubSystem0];
+            break;
+	    case slotTypeRig:
+            return m_RigModules[flag - flagRigSlot0];
+            break;
+	    case slotTypeLowPower:
+            return m_LowSlotModules[flag - flagLowSlot0];
+            break;
+	    case slotTypeMedPower:
+            return m_MediumSlotModules[flag - flagMedSlot0];
+            break;
+	    case slotTypeHiPower:
+            return m_HighSlotModules[flag - flagHiSlot0];
+            break;
 	}
 	
 	return NULL;
@@ -295,12 +319,24 @@ void ModuleContainer::_removeModule(EVEItemFlags flag, GenericModule * mod)
 {
     switch(_checkBounds(flag))
 	{
-    case NaT:					sLog.Error("ModuleContainer::_removeModule()","Flag Out of bounds");	break; 
-	case slotTypeSubSystem:		_removeSubSystemModule(flag);				break;
-	case slotTypeRig:			_removeRigSlotModule(flag);					break;
-	case slotTypeLowPower:		_removeLowSlotModule(flag);					break;
-	case slotTypeMedPower:		_removeMediumSlotModule(flag);				break;
-	case slotTypeHiPower:		_removeHighSlotModule(flag);				break;
+    case NaT:
+        sLog.Error("ModuleContainer::_removeModule()","Flag Out of bounds");
+        break; 
+	case slotTypeSubSystem:
+        m_SubSystemModules[flag-flagSubSystem0] = NULL;
+        break;
+	case slotTypeRig:
+        m_RigModules[flag-flagRigSlot0] = NULL;
+        break;
+	case slotTypeLowPower:
+        m_LowSlotModules[flag-flagLowSlot0] = NULL;
+        break;
+	case slotTypeMedPower:
+        m_MediumSlotModules[flag-flagMedSlot0] = NULL;
+        break;
+	case slotTypeHiPower:
+        m_HighSlotModules[flag-flagHiSlot0] = NULL;
+        break;
 	}
 
     // Maintain Turret and Launcher Fitted module counts:
@@ -421,82 +457,6 @@ void ModuleContainer::_processEx(processType p, slotType t)
 	}
 }
 
-
-void ModuleContainer::_addSubSystemModule(uint32 flag, GenericModule * mod)
-{
-	m_SubSystemModules[flag - flagSubSystem0] = mod;
-}
-
-void ModuleContainer::_addRigModule(uint32 flag, GenericModule * mod)
-{
-	m_RigModules[flag - flagRigSlot0] = mod;
-}
-
-void ModuleContainer::_addLowSlotModule(uint32 flag, GenericModule * mod)
-{
-	m_LowSlotModules[flag - flagLowSlot0] = mod;
-}
-
-void ModuleContainer::_addMediumSlotModule(uint32 flag, GenericModule * mod)
-{
-	m_MediumSlotModules[flag - flagMedSlot0] = mod;
-}
-
-void ModuleContainer::_addHighSlotModule(uint32 flag, GenericModule * mod)
-{
-	m_HighSlotModules[flag - flagHiSlot0] = mod;
-}
-
-GenericModule * ModuleContainer::_getSubSystemModule(uint32 flag)
-{
-	return m_SubSystemModules[flag - flagSubSystem0];
-}
-
-GenericModule * ModuleContainer::_getRigModule(uint32 flag)
-{
-	return m_RigModules[flag - flagRigSlot0];
-}
-
-GenericModule * ModuleContainer::_getLowSlotModule(uint32 flag)
-{
-	return m_LowSlotModules[flag - flagLowSlot0];
-}
-
-GenericModule * ModuleContainer::_getMediumSlotModule(uint32 flag)
-{
-	return m_MediumSlotModules[flag - flagMedSlot0];
-}
-
-GenericModule * ModuleContainer::_getHighSlotModule(uint32 flag)
-{
-	return m_HighSlotModules[flag - flagHiSlot0];
-}
-
-void ModuleContainer::_removeSubSystemModule(uint32 flag)
-{
-	m_SubSystemModules[flag-flagSubSystem0] = NULL;
-}
-
-void ModuleContainer::_removeRigSlotModule(uint32 flag)
-{
-	m_RigModules[flag-flagRigSlot0] = NULL;
-}
-
-void ModuleContainer::_removeLowSlotModule(uint32 flag)
-{
-	m_LowSlotModules[flag-flagLowSlot0] = NULL;
-}
-
-void ModuleContainer::_removeMediumSlotModule(uint32 flag)
-{
-	m_MediumSlotModules[flag-flagMedSlot0] = NULL;
-}
-
-void ModuleContainer::_removeHighSlotModule(uint32 flag)
-{
-	m_HighSlotModules[flag-flagHiSlot0] = NULL;
-}
-
 //TODO - make this better -Luck
 EVEItemSlotType ModuleContainer::_checkBounds(uint32 flag)
 {
@@ -611,6 +571,8 @@ void ModuleContainer::_initializeModuleContainers()
 
 }
 #pragma endregion
+/////////////////////////// END MODULECONTAINER //////////////////////////////////
+
 
 //ModuleManager class definitions
 #pragma region ModuleManagerClass
@@ -636,7 +598,7 @@ ModuleManager::ModuleManager(Ship *const ship)
         InventoryItemRef itemRef;
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
-            _fitModule( itemRef );
+            _fitModule( itemRef, (EVEItemFlags)flagIndex );
     }
 
     for(flagIndex=flagMedSlot0; flagIndex<=flagMedSlot7; flagIndex++)
@@ -644,7 +606,7 @@ ModuleManager::ModuleManager(Ship *const ship)
         InventoryItemRef itemRef;
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
-            _fitModule( itemRef );
+            _fitModule( itemRef, (EVEItemFlags)flagIndex );
     }
 
     for(flagIndex=flagHiSlot0; flagIndex<=flagHiSlot7; flagIndex++)
@@ -652,7 +614,7 @@ ModuleManager::ModuleManager(Ship *const ship)
         InventoryItemRef itemRef;
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
-            _fitModule( itemRef );
+            _fitModule( itemRef, (EVEItemFlags)flagIndex );
     }
 
     for(flagIndex=flagRigSlot0; flagIndex<=flagRigSlot7; flagIndex++)
@@ -660,7 +622,7 @@ ModuleManager::ModuleManager(Ship *const ship)
         InventoryItemRef itemRef;
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
-            _fitModule( itemRef );
+            _fitModule( itemRef, (EVEItemFlags)flagIndex );
     }
 
     for(flagIndex=flagSubSystem0; flagIndex<=flagSubSystem7; flagIndex++)
@@ -668,7 +630,7 @@ ModuleManager::ModuleManager(Ship *const ship)
         InventoryItemRef itemRef;
         m_Ship->FindSingleByFlag( (EVEItemFlags)flagIndex, itemRef );
         if( !(itemRef == NULL) )
-            _fitModule( itemRef );
+            _fitModule( itemRef, (EVEItemFlags)flagIndex );
     }
 }
 
@@ -714,12 +676,17 @@ void ModuleManager::_SendErrorMessage(const char *fmt, ...)
 	}
 }
 
-void ModuleManager::InstallRig(InventoryItemRef item)
+bool ModuleManager::InstallRig(InventoryItemRef item, EVEItemFlags flag)
 {
 	if(item->groupID() >= 773 && item->groupID() <= 786 && item->groupID() != 783)
-		_fitModule(item);
+    {
+		_fitModule(item,flag);
+        return true;
+    }
 	else
 		sLog.Debug("ModuleManager","%s tried to fit item %u, which is not a rig", m_Ship->GetOperator()->GetName(), item->itemID());
+
+    return false;
 }
 
 void ModuleManager::UninstallRig(uint32 itemID)
@@ -729,25 +696,35 @@ void ModuleManager::UninstallRig(uint32 itemID)
 		mod->DestroyRig();
 }
 
-void ModuleManager::SwapSubSystem(InventoryItemRef item)
+bool ModuleManager::SwapSubSystem(InventoryItemRef item, EVEItemFlags flag)
 {
 	if(item->groupID() >= 954 && item->groupID() <= 958)
-		_fitModule(item);
+    {
+		_fitModule(item,flag);
+        return true;
+    }
 	else
 		sLog.Debug("ModuleManager","%s tried to fit item %u, which is not a subsystem", m_Ship->GetOperator()->GetName(), item->itemID());
+
+    return false;
 }
 
-void ModuleManager::FitModule(InventoryItemRef item)
+bool ModuleManager::FitModule(InventoryItemRef item, EVEItemFlags flag)
 {
 	if(item->categoryID() == EVEDB::invCategories::Module)
     {
         // Attempt to fit the module
-		if( _fitModule(item) )
+		if( _fitModule(item, flag) )
+        {
             // Now that module is successfully fitted, attempt to put it Online:
             Online(item->itemID());
+            return true;
+        }
     }
 	else
 		sLog.Debug("ModuleManager","%s tried to fit item %u, which is not a module", m_Ship->GetOperator()->GetName(), item->itemID());
+
+    return false;
 }
 
 void ModuleManager::UnfitModule(uint32 itemID)
@@ -760,7 +737,7 @@ void ModuleManager::UnfitModule(uint32 itemID)
 	}
 }
 
-bool ModuleManager::_fitModule(InventoryItemRef item)
+bool ModuleManager::_fitModule(InventoryItemRef item, EVEItemFlags flag)
 {
     bool verifyFailed = false;
 	GenericModule * mod = ModuleFactory(item, ShipRef(m_Ship));
@@ -798,7 +775,8 @@ bool ModuleManager::_fitModule(InventoryItemRef item)
     else
     {
         // Fit Module now that all checks have passed:
-        m_Modules->AddModule(mod->flag(), mod);
+        //m_Modules->AddModule(mod->flag(), mod);
+        m_Modules->AddModule(flag, mod);
     }
 
     if( verifyFailed )
