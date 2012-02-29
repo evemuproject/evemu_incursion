@@ -763,7 +763,7 @@ bool ModuleManager::_fitModule(InventoryItemRef item, EVEItemFlags flag)
         verifyFailed = true;
     }
     // Check for max modules of group allowed:
-    else if( m_Modules->GetFittedModuleCountByGroup(item->groupID()) == mod->getItem()->GetAttribute(AttrMaxGroupFitted).get_int() )
+    else if( mod->isMaxGroupFitLimited() && (m_Modules->GetFittedModuleCountByGroup(item->groupID()) == mod->getItem()->GetAttribute(AttrMaxGroupFitted).get_int()) )
     {
         //std::map<std::string, PyRep *> args;
         //args["typename"] = new PyString(item->itemName().c_str());

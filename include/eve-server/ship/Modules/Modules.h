@@ -93,6 +93,14 @@ public:
             return false;
     }
 
+    virtual bool isMaxGroupFitLimited()
+    {
+        if( m_Item->HasAttribute(AttrMaxGroupFitted) )
+            return true;
+        else
+            return false;
+    }
+
 	virtual bool isRig() 
 	{
 		uint32 i = m_Item->categoryID();
