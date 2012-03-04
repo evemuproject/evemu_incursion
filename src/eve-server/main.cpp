@@ -211,6 +211,7 @@ int main( int argc, char* argv[] )
 	services.RegisterService(new MailMgrService(&services));
 	services.RegisterService(new MailingListMgrService(&services));
 	services.RegisterService(new NotificationMgrService(&services));
+	services.RegisterService(new RepairService(&services));
 
     sLog.Log("server init", "Priming cached objects.");
     services.cache_service->PrimeCache();

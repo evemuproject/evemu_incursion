@@ -334,6 +334,7 @@
 #include "standing/WarRegistryService.h"
 
 #include "station/JumpCloneService.h"
+#include "station/RepairSvc.h"
 #include "station/Station.h"
 #include "station/StationDB.h"
 #include "station/StationService.h"

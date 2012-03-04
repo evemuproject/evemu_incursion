@@ -27,29 +27,29 @@
 
 PyObject *AccountDB::GetEntryTypes() {
 	DBQueryResult res;
-	
+
 	if(!sDatabase.RunQuery(res, "SELECT refTypeID AS entryTypeID,refTypeText AS entryTypeName,description FROM market_refTypes"))
     {
         sLog.Error("Account DB", "Error in query: %s", res.error.c_str());
 		return NULL;
 	}
-	
+
 	return DBResultToRowset(res);
 }
 
 PyObject *AccountDB::GetKeyMap() {
 	DBQueryResult res;
-	
+
 	if(!sDatabase.RunQuery(res, "SELECT accountKey AS keyID,accountType AS keyType,accountName AS keyName,description FROM market_keyMap"))
     {
         sLog.Error("Account DB", "Error in query: %s", res.error.c_str());
 		return NULL;
 	}
-	
+
 	return DBResultToRowset(res);
 }
 
-PyObject *AccountDB::GetJournal(uint32 charID, uint32 refTypeID, uint32 accountKey, uint64 transDate) {
+PyObjectEx *AccountDB::GetJournal(uint32 charID, uint32 refTypeID, uint32 accountKey, uint64 transDate) {
 //'refID', 'transDate', 'refTypeID','ownerID1', 'ownerID2', 'argID1', 'accountID', 'amount', 'balance', 'reason'
 
 	DBQueryResult res;
@@ -57,7 +57,7 @@ PyObject *AccountDB::GetJournal(uint32 charID, uint32 refTypeID, uint32 accountK
 	//dF = transDate;
 	dT = transDate - Win32Time_Day;
 	// 1 sec = 10.000.000 wow...
-	
+
 	if(!sDatabase.RunQuery(res,
 		"SELECT refID AS transactionID,transDate AS transactionDate,0 AS referenceID, refTypeID AS entryTypeID,ownerID1,ownerID2,argID1, accountKey,amount,balance,reason AS description "
 		"FROM market_journal "
@@ -69,8 +69,8 @@ PyObject *AccountDB::GetJournal(uint32 charID, uint32 refTypeID, uint32 accountK
         sLog.Error("Account DB", "Error in query: %s", res.error.c_str());
 		return NULL;
 	}
-	
-	return DBResultToRowset(res);
+
+	return DBResultToCRowset( res );
 }
 
 //////////////////////////////////
@@ -83,13 +83,13 @@ bool ServiceDB::GiveCash( uint32 characterID, JournalRefType refTypeID, uint32 o
 //the only unknown it is argID1 , what is it ?
 	DBQueryResult res;
 	DBerror err;
-	
+
 	std::string eReason;
 	sDatabase.DoEscapeString(eReason, reason);
 	std::string eArg1;
 	sDatabase.DoEscapeString(eArg1, argID1);
 
-	if(!sDatabase.RunQuery(err, 
+	if(!sDatabase.RunQuery(err,
         "INSERT INTO market_journal(characterID,refID,transDate,refTypeID,ownerID1,ownerID2,argID1,accountID,accountKey,amount,balance,reason) "
         "VALUES (%u,NULL," I64u ",%u,%u,%u,\"%s\",%u,%u,%.2f,%.2f,\"%s\")",
 		characterID, Win32TimeNow(), refTypeID, ownerFromID, ownerToID, eArg1.c_str(), accountID, accountKey, amount, balance, eReason.c_str()))

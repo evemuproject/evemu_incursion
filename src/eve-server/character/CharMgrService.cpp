@@ -27,6 +27,38 @@
 
 PyCallable_Make_InnerDispatcher(CharMgrService)
 
+class CharacterBound
+: public PyBoundObject {
+public:
+
+	PyCallable_Make_Dispatcher(CharacterBound)
+	
+	CharacterBound(PyServiceMgr *mgr)
+	: PyBoundObject(mgr),
+	  m_dispatch(new Dispatcher(this))
+	{
+		_SetCallDispatcher(m_dispatch);
+		
+		m_strBoundObjectName = "CharacterBound";
+
+		PyCallable_REG_CALL(CharacterBound, List)
+		PyCallable_REG_CALL(CharacterBound, ListStations)
+		PyCallable_REG_CALL(CharacterBound, ListStationItems)
+	}
+	virtual ~CharacterBound() { delete m_dispatch; }
+	virtual void Release() {
+		//I hate this statement
+		delete this;
+	}
+	
+	PyCallable_DECL_CALL(List)
+	PyCallable_DECL_CALL(ListStations)
+	PyCallable_DECL_CALL(ListStationItems)
+
+protected:
+	Dispatcher *const m_dispatch;
+};
+
 CharMgrService::CharMgrService(PyServiceMgr *mgr)
 : PyService(mgr, "charMgr"),
   m_dispatch(new Dispatcher(this))
@@ -45,6 +77,14 @@ CharMgrService::CharMgrService(PyServiceMgr *mgr)
 
 CharMgrService::~CharMgrService() {
 	delete m_dispatch;
+}
+
+PyBoundObject* CharMgrService::_CreateBoundObject( Client* c, const PyRep* bind_args )
+{
+	_log( CLIENT__MESSAGE, "CharMgrService bind request for:" );
+	bind_args->Dump( CLIENT__MESSAGE, "    " );
+
+	return new CharacterBound( m_manager );
 }
 
 PyResult CharMgrService::Handle_GetContactList(PyCallArgs &call)
@@ -158,25 +198,39 @@ PyResult CharMgrService::Handle_GetFactions( PyCallArgs& call )
 }
 
 
+PyResult CharacterBound::Handle_ListStations( PyCallArgs& call )
+{
+	ItemDB m_db;
+	return m_db.ListStations( call.client->GetCharacterID() );
+}
 
+PyResult CharacterBound::Handle_ListStationItems( PyCallArgs& call )
+{
+	uint32 stationID = 0;
+	Call_SingleIntegerArg arg;
 
+	if( !arg.Decode( &call.tuple ) )
+	{
+		_log( SERVICE__ERROR, "Bad arguments to ListStationItems" );
+		
+		if( call.client->IsInSpace() == true )
+		{
+			_log( SERVICE__ERROR, "Client is in space. We cant get stationID. Aborting..." );
+			return new PyNone;
+		}
 
+		stationID = call.client->GetStationID();
+	}
+	else
+		stationID = arg.arg;
 
+	ItemDB m_db;
+	return m_db.ListStationItems( call.client->GetCharacterID(), stationID );
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+PyResult CharacterBound::Handle_List( PyCallArgs& call )
+{
+	ItemDB m_db;
+	return m_db.ListItems( call.client->GetCharacterID() );
+}
 

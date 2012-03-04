@@ -342,6 +342,7 @@ SET( ship_INCLUDE
      "${TARGET_INCLUDE_DIR}/ship/DestinyManager.h"
      "${TARGET_INCLUDE_DIR}/ship/dgmtypeattributeinfo.h"
      "${TARGET_INCLUDE_DIR}/ship/Drone.h"
+	 "${TARGET_INCLUDE_DIR}/ship/InsuranceDB.h"
      "${TARGET_INCLUDE_DIR}/ship/InsuranceService.h"
      "${TARGET_INCLUDE_DIR}/ship/ModuleManager.h"
      "${TARGET_INCLUDE_DIR}/ship/Ship.h"
@@ -354,6 +355,7 @@ SET( ship_SOURCE
      "${TARGET_SOURCE_DIR}/ship/DestinyManager.cpp"
      "${TARGET_SOURCE_DIR}/ship/dgmtypeattributeinfo.cpp"
      "${TARGET_SOURCE_DIR}/ship/Drone.cpp"
+	 "${TARGET_SOURCE_DIR}/ship/InsuranceDB.cpp"
      "${TARGET_SOURCE_DIR}/ship/InsuranceService.cpp"
      "${TARGET_SOURCE_DIR}/ship/ModuleManager.cpp"
      "${TARGET_SOURCE_DIR}/ship/Ship.cpp"
@@ -422,12 +424,14 @@ SET( sovereignty_SOURCE
 
 SET( station_INCLUDE
      "${TARGET_INCLUDE_DIR}/station/JumpCloneService.h"
+	 "${TARGET_INCLUDE_DIR}/station/RepairSvc.h"
      "${TARGET_INCLUDE_DIR}/station/Station.h"
      "${TARGET_INCLUDE_DIR}/station/StationDB.h"
      "${TARGET_INCLUDE_DIR}/station/StationService.h"
      "${TARGET_INCLUDE_DIR}/station/StationSvcService.h" )
 SET( station_SOURCE
      "${TARGET_SOURCE_DIR}/station/JumpCloneService.cpp"
+	 "${TARGET_SOURCE_DIR}/station/RepairSvc.cpp"
      "${TARGET_SOURCE_DIR}/station/Station.cpp"
      "${TARGET_SOURCE_DIR}/station/StationDB.cpp"
      "${TARGET_SOURCE_DIR}/station/StationService.cpp"

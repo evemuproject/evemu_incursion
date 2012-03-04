@@ -207,13 +207,15 @@ PyResult CorpRegistryBound::Handle_GetCorporations(PyCallArgs &call) {
 }
 
 
-PyResult CorpRegistryBound::Handle_AddCorporation(PyCallArgs &call) {
-    Call_AddCorporation args;
+PyResult CorpRegistryBound::Handle_AddCorporation( PyCallArgs& call )
+{
+	Call_AddCorporation args;
 
-    if (!args.Decode(&call.tuple)) {
-        codelog(SERVICE__ERROR, "%s: Bad arguments", call.client->GetName());
-        return(new PyInt(0));
-    }
+	if( !args.Decode( &call.tuple ) )
+	{
+		codelog( SERVICE__ERROR, "%s: Bad arguments to CorpRegistryBound::AddCorporation()", call.client->GetName() );
+		return new PyInt( 0 );
+	}
 
     //first make sure the char can even afford it.
     uint32 corp_costu;
