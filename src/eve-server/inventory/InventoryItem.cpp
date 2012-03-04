@@ -658,8 +658,32 @@ PyObject * InventoryItem::ItemGetInfo()
 {
     Rsp_ItemGetInfo result;
 
-    if(!Populate(result.entry))
-        return NULL;    //print already done.
+    //if(!Populate(result.entry))
+    //    return NULL;    //print already done.
+
+    // TODO: properly populate the new structure of Rsp_ItemGetInfo:
+    // fill in itemID, attributes list as a dictionary of <int,int> pairs
+    // an invItem row, and an activeEffects dictionary of <unknown,unknown> - just make this last an empty <int,int> dictionary
+    result.itemID = (int64)m_itemID;
+    result.invItem = GetItemRow();
+    PyDict * attributesDict = new PyDict();
+
+    //attributes:
+    AttributeMap::AttrMapItr itr = mAttributeMap.begin();
+    AttributeMap::AttrMapItr itr_end = mAttributeMap.end();
+    for (; itr != itr_end; itr++)
+    {
+        PyInt * pyIntRef = new PyInt(itr->first);
+        if( itr->second.get_type() == evil_number_int )
+            attributesDict->SetItem(new PyInt(itr->first), new PyInt(itr->second.get_int()));
+        else
+            attributesDict->SetItem(new PyInt(itr->first), new PyFloat(itr->second.get_float()));
+        //result.attributes[(*itr).first] = (*itr).second.GetPyObject();
+    }
+
+    result.attributes = attributesDict;
+    result.time = Win32TimeNow();
+    result.activeEffects = new PyDict();
 
     return(result.Encode());
 }

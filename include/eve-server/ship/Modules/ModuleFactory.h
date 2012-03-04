@@ -48,7 +48,7 @@ static GenericModule* ModuleFactory(InventoryItemRef item, ShipRef ship)
 		switch(item->groupID())
 		{
             // Armor Modules Subgroup:
-            case EVEDB::invGroups::Damage_Control:                          return NULL;    // Active
+            case EVEDB::invGroups::Damage_Control:                          return (new ActiveModule(item, ship)); break;    // Active
             case EVEDB::invGroups::Armor_Repair_Unit:                       return NULL;    // Active
             case EVEDB::invGroups::Hull_Repair_Unit:                        return NULL;    // Active
             case EVEDB::invGroups::Reinforced_Bulkheads:                    return (new PassiveModule(item, ship)); break;
@@ -142,7 +142,7 @@ static GenericModule* ModuleFactory(InventoryItemRef item, ShipRef ship)
             case EVEDB::invGroups::Shield_Disruptor:                        return NULL;    // Active
 
             // Weapon Modules Subgroup:
-            case EVEDB::invGroups::Energy_Weapon:                           return NULL;    // Active
+            case EVEDB::invGroups::Energy_Weapon:                           return (new ActiveModule(item, ship)); break;    // Active
             case EVEDB::invGroups::Projectile_Weapon:                       return NULL;    // Active
             case EVEDB::invGroups::Gyrostabilizer:                          return (new PassiveModule(item, ship)); break;
             case EVEDB::invGroups::Energy_Vampire:                          return NULL;    // Active
@@ -163,7 +163,7 @@ static GenericModule* ModuleFactory(InventoryItemRef item, ShipRef ship)
             case EVEDB::invGroups::Missile_Launcher_Citadel:                return NULL;    // Active
             case EVEDB::invGroups::Super_Weapon:                            return NULL;    // Active
             case EVEDB::invGroups::Interdiction_Sphere_Launcher:            return NULL;    // Active
-            case EVEDB::invGroups::Missile_Launcher_Heavy_Assault:          return NULL;    // Active
+            case EVEDB::invGroups::Missile_Launcher_Heavy_Assault:          return (new ActiveModule(item, ship)); break;    // Active
             case EVEDB::invGroups::Missile_Launcher_Bomb:                   return NULL;    // Active
             case EVEDB::invGroups::Warp_Disrupt_Field_Generator:            return NULL;    // Active
 

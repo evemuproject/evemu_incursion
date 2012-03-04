@@ -185,21 +185,28 @@
 
   <elementDef name="Rsp_ItemGetInfo">
     <objectInline>
-      <stringInline value="util.Row" />
-	    <dictInline>
-	      <dictInlineEntry key="header">
-		      <listInline>
-		        <stringInline value="itemID" />
-		        <stringInline value="invItem" />
-		        <stringInline value="activeEffects" />
-		        <stringInline value="attributes" />
-		        <stringInline value="time" />
-          </listInline>
-	      </dictInlineEntry>
-	      <dictInlineEntry key="line">
-		      <element name="entry" type="Rsp_CommonGetInfo_Entry" />
-	      </dictInlineEntry>
-	    </dictInline>
+      <stringInline value="util.KeyVal" />
+      <dictInline>
+        <dictInlineEntry key="itemID">
+          <long name="itemID" />
+        </dictInlineEntry>
+        <!-- entry of type PyDict to be filled with item's attributes -->
+        <dictInlineEntry key="attributes">
+          <raw name="attributes" />
+        </dictInlineEntry>
+        <!-- this is an ItemRow: itemID, typeID, ownerID, locationID, flagID, quantity, groupID, categoryID, customInfo(string) -->
+        <dictInlineEntry key="invItem">
+          <raw name="invItem" />
+        </dictInlineEntry>
+        <!-- time! -->
+        <dictInlineEntry key="time">
+            <long name="time" />
+        </dictInlineEntry>
+        <!-- this maps effectType to EntityEffectState, it is a dictionary -->
+        <dictInlineEntry key="activeEffects">
+          <raw name="activeEffects" />
+        </dictInlineEntry>
+      </dictInline>
     </objectInline>
   </elementDef>
 

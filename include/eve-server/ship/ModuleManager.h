@@ -261,6 +261,9 @@ public:
 	void ProcessExternalEffect(Effect * e);
 	std::vector<GenericModule *> GetStackedItems(uint32 typeID, ModulePowerLevel level);  //should only be used by components
 
+    GenericModule * GetModule(EVEItemFlags flag)    { return m_Modules->GetModule(flag); }
+    GenericModule * GetModule(uint32 itemID)        { return m_Modules->GetModule(itemID); }
+
     void SaveModules();
 
 private:
