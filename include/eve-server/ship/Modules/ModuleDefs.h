@@ -37,24 +37,41 @@ enum ModuleCommand
 	OFFLINE,
 	ACTIVATE,
 	DEACTIVATE,
-	OVERLOAD,   //idk if this is used yet - or what it's called :)
-	DEOVERLOAD  //idk if this is used
+	OVERLOAD,       //idk if this is used yet - or what it's called :)
+	DEOVERLOAD,     //idk if this is used
+    LOAD_CHARGE,
+    RELOAD_CHARGE,
+    UNLOAD_CHARGE
+};
+
+enum ModuleStates
+{
+    MOD_UNFITTED,
+    MOD_OFFLINE,
+    MOD_ONLINE,
+    MOD_ACTIVATED,
+    MOD_DEACTIVATING,
+    MOD_OVERLOADED,
+    MOD_UNLOADED,
+    MOD_LOADED,
+    MOD_LOADING,
+    MOD_RELOADING
 };
 
 // These are the module states where an effect will, ahem, take 'effect':
 enum ModuleEffectTriggers
 {
-    ONLINING,       // means the effect takes effect on the target (see below) upon entering the ONLINE state
-    ACTIVATING,     // used only for ACTIVE modules with NO duration attribute; means the effect takes effect on the
-                    // target (see below) upon entering the ACTIVATE state
-    CYCLING         // used only for modules with A duration attribute; means the effect takes effect on the
-};                  //  target (see below) one extra time when in ACTIVATE state after each CYCLE duration expires
+    EFFECT_ONLINE,              // means the effect takes effect on the target (see below) upon entering the ONLINE state
+    EFFECT_ACTIVE_MAINTAIN,     // used only for ACTIVE modules with NO duration attribute; means the effect takes effect on the
+                                // target (see below) upon entering the ACTIVATE state, then reversed when going out of ACTIVATE state
+    EFFECT_ACTIVE_CONSUME       // used only for modules with A duration attribute; means the effect takes effect on the
+};                              // target (see below) one extra time when in ACTIVATE state after each CYCLE duration expires
 
 // These are the targets to which module effects are applied when activated:
 enum ModuleEffectTargets
 {
     SELF,           // means the target of the effect is the module's own attribute(s)
-    SHIP,           // means the target of the effect is the ship's attribute(s) to which the module is fitted
+    SHIP,           // means the target of the effect is the attribute(s) of the ship to which the module is fitted
     TARGET          // means the target of the effect is the attribute(s) of the current target of the ship to which the module is fitted
 };
 

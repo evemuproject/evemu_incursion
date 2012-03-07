@@ -36,7 +36,10 @@
 class GenericModule
 {
 public:
-	GenericModule() { }
+	GenericModule()
+    {
+        m_Module_State = MOD_UNFITTED;
+    }
 	virtual ~GenericModule() 
 	{
     // ALL DERIVED CLASSES SHOULD OVERRIDE THIS
@@ -116,6 +119,8 @@ protected:
 	InventoryItemRef m_Item;
 	ShipRef m_Ship;
 	ModuleEffects * m_Effects;
+
+    ModuleStates m_Module_State;
 
 };
 
