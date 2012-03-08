@@ -27,6 +27,7 @@
 #ifndef __CORPORATIONCARRIER_H_INCL__
 #define __CORPORATIONCARRIER_H_INCL__
 
+// TODO: Add flag storage to know in which slot of the OfficeFolder it is installed
 class OfficeInfo {
 public:
 	uint32 officeID;
@@ -38,16 +39,24 @@ public:
 	OfficeInfo(uint32 corpID, uint32 statID) {
 		corporationID = corpID;
 		stationID = statID;						// starts with 60...
-		officeFolderID = stationID + 6000000;	// starts with 66...
-		typeID = 1932;							// No idea what this should be or if it should be different for each of them...
+		officeFolderID = 0;						// All the stations should contain an officeFolder( typeID = 27 )
+		typeID = 27;							// No idea what this should be or if it should be different for each of them...
 		officeID = 0;
 	}
 
 	OfficeInfo(uint32 corpID, uint32 statID, uint32 offID) {
 		corporationID = corpID;
 		stationID = statID;						// starts with 60...
-		officeFolderID = stationID + 6000000;	// starts with 66...
-		typeID = 1932;							// No idea what this should be or if it should be different for each of them...
+		officeFolderID = 0;						// All the stations should contain an officeFolder( typeID = 27 )
+		typeID = 27;							// No idea what this should be or if it should be different for each of them...
+		officeID = offID;
+	}
+
+	OfficeInfo(uint32 corpID, uint32 statID, uint32 offID, uint32 folderID) {
+		corporationID = corpID;
+		stationID = statID;
+		officeFolderID = folderID;
+		typeID = 27;
 		officeID = offID;
 	}
 };

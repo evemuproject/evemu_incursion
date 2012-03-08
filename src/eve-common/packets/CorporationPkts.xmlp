@@ -347,6 +347,40 @@
       </tupleInline>
     </objectInline>
   </elementDef>
+  
+  <!-- Basic clone of the above call -->
+  <elementDef name="GetMembersSparseRowset">
+    <objectInline>
+      <stringInline value="util.SparseRowset" />
+      <tupleInline>
+        <listInline>
+          <stringInline value="characterID" />
+          <stringInline value="divisionID" />
+          <stringInline value="squadronID" />
+          <stringInline value="title" />
+          <stringInline value="roles" />
+          <stringInline value="grantableRoles" />
+          <stringInline value="startDateTime" />
+          <stringInline value="baseID" />
+          <stringInline value="rolesAtHQ" />
+          <stringInline value="grantableRolesAtHQ" />
+          <stringInline value="rolesAtBase" />
+          <stringInline value="grantableRolesAtBase" />
+          <stringInline value="rolesAtOther" />
+          <stringInline value="grantableRolesAtOther" />
+          <stringInline value="titleMask" />
+          <stringInline value="accountKey" />
+          <stringInline value="rowData" />
+          <stringInline value="blockRoles" />
+        </listInline>
+
+        <!-- This is a SubStruct, be careful -->
+        <!-- Should contain a String, Dict and int -->
+        <raw name="bindedObject" />
+        <int name="realRowCount" default="2" />
+      </tupleInline>
+    </objectInline>
+  </elementDef>
 
   <elementDef name="Notify_OnObjectPublicAttributesUpdated">
     <tupleInline>
@@ -428,6 +462,15 @@
         <int name="officeID" />
         <list name="params" />
       </tupleInline>
+    </listInline>
+  </elementDef>
+
+  <elementDef name="Reply_FetchMember">
+    <listInline>
+     <tupleInline>
+        <int name="memberID" />
+        <list name="params" />
+     </tupleInline>
     </listInline>
   </elementDef>
 
@@ -657,13 +700,20 @@
 
   <elementDef name="Call_UpdateDivisionNames">
     <tupleInline>
-      <string name="div1" />
-      <string name="div2" />
-      <string name="div3" />
-      <string name="div4" />
-      <string name="div5" />
-      <string name="div6" />
-      <string name="div7" />
+      <wstring name="div1" />
+      <wstring name="div2" />
+      <wstring name="div3" />
+      <wstring name="div4" />
+      <wstring name="div5" />
+      <wstring name="div6" />
+      <wstring name="div7" />
+      <wstring name="wal1" />
+      <wstring name="wal2" />
+      <wstring name="wal3" />
+      <wstring name="wal4" />
+      <wstring name="wal5" />
+      <wstring name="wal6" />
+      <wstring name="wal7" />
     </tupleInline>
   </elementDef>
 
@@ -690,7 +740,7 @@
   <elementDef name="Call_GetRecruitmentAdsByCriteria">
     <tupleInline>
       <int name="regionID" />
-      <int name="skillPoints" />
+      <real name="skillPoints" />
       <int name="typeMask" />
       <int name="raceMask" />
       <!-- integer boolean -->

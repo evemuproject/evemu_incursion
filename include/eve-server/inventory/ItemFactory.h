@@ -130,6 +130,23 @@ public:
 	CelestialObjectRef GetCelestialObject(uint32 celestialID);
 
 	/**
+	 * Loads office object.
+	 *
+	 * @param[in] officeID ID of office object to load.
+	 * @return Pointer to OfficeObject; NULL if fails.
+	 */
+	OfficeRef GetOffice( uint32 officeID );
+
+	/**
+	 * Loads officeFolder object.
+	 *
+	 * @param[in] officeFolderID ID of officeFolder object to load.
+	 * @return Pointer to OfficeFolder Object; NULL if fails.
+	 */
+	OfficeFolderRef GetOfficeFolder( uint32 officeFolderID );
+
+
+	/**
 	 * Loads solar system.
 	 *
 	 * @param[in] solarSystemID ID of solar system to load.

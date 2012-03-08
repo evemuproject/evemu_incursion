@@ -84,6 +84,12 @@ bool InsuranceDB::GetStationItems( std::vector<int32> &into, uint32 stationID, u
 
 bool InsuranceDB::InsureShip( uint32 shipID, uint32 ownerID, double fraction )
 {
+	// First of all check if the ship is already insured and UnInsure it
+	if( IsShipInsured( shipID ) )
+	{
+		UnInsureShip( shipID );
+	}
+
 	DBerror err;
 	uint64 endDate = Win32TimeNow() + ( ( Win32Time_Day * 7 ) * 12 );
 
@@ -103,17 +109,38 @@ bool InsuranceDB::InsureShip( uint32 shipID, uint32 ownerID, double fraction )
 	return true;
 }
 
+bool InsuranceDB::IsShipInsured( uint32 shipID )
+{
+	DBQueryResult res;
+	DBResultRow row;
 
-bool InsuranceDB::UnInsureShip( uint32 shipID, uint32 characterID )
+	if( !sDatabase.RunQuery( res,
+		"SELECT"
+		" insuranceID"
+		" FROM chrshipinsurances"
+		" WHERE shipID = %u", shipID ) )
+	{
+		_log( DATABASE__ERROR, "Cant know if ship %u is insured. Error: %s", shipID, res.error.c_str() );
+		return false;
+	}
+
+	if( res.GetRow( row ) )
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InsuranceDB::UnInsureShip( uint32 shipID )
 {
 	DBerror err;
 
 	if( !sDatabase.RunQuery( err,
 		"DELETE FROM chrshipinsurances"
-		" WHERE ownerID=%u"
-		" AND shipID=%u", characterID, shipID ))
+		" WHERE shipID=%u", shipID ))
 	{
-		_log(DATABASE__ERROR, "Cant UnInsure ship %u for character %u. Error: %s", shipID, characterID, err.c_str() );
+		_log(DATABASE__ERROR, "Cant UnInsure ship %u. Error: %s", shipID, err.c_str() );
 		return false;
 	}
 

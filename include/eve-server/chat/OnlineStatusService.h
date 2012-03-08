@@ -37,8 +37,10 @@ public:
 protected:
 	class Dispatcher;
 	Dispatcher *const m_dispatch;
+	LSCDB* m_db;
 
 	PyCallable_DECL_CALL(GetInitialState)
+	PyCallable_DECL_CALL(GetOnlineStatus)
 };
 
 

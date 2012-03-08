@@ -35,6 +35,7 @@ m_dispatch(new Dispatcher(this))
 	_SetCallDispatcher(m_dispatch);
 
 	PyCallable_REG_CALL(OnlineStatusService, GetInitialState)
+	PyCallable_REG_CALL(OnlineStatusService, GetOnlineStatus)
 }
 
 OnlineStatusService::~OnlineStatusService() {
@@ -51,3 +52,19 @@ PyResult OnlineStatusService::Handle_GetInitialState(PyCallArgs &call) {
 	CRowSet *rowset = new CRowSet( &header );
 	return rowset;
 }
+
+PyResult OnlineStatusService::Handle_GetOnlineStatus( PyCallArgs &call )
+{
+	sLog.Debug( "OnlineStatusService", "Called GetOnlineStatus stub" );
+
+	Call_SingleIntegerArg arg;
+
+	if( !arg.Decode( &call.tuple ) )
+	{
+		_log( SERVICE__ERROR, "Wrong parameters to GetOnlineStatus" );
+		return NULL;
+	}
+
+	return new PyBool( m_db->IsCharacterOnline( arg.arg ) );
+}
+

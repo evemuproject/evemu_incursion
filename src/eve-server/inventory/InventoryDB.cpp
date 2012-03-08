@@ -375,6 +375,81 @@ bool InventoryDB::GetStationType(uint32 stationTypeID, StationTypeData &into) {
     return true;
 }
 
+bool InventoryDB::GetOfficeFolder( uint32 stationID, uint32 &officeFolderID )
+{
+	DBQueryResult res;
+	DBResultRow row;
+
+	// Get the office folder id for given stationID
+	if( !sDatabase.RunQuery(res,
+		"SELECT"
+		" itemID"
+		" FROM entity"
+		" WHERE ownerID=%u"
+		" AND flag=26", stationID ) )
+	{
+		codelog( SERVICE__ERROR, "Error in query for officeFolder of station %u: %s", stationID, res.error.c_str() );
+		return false;
+	}
+
+	// Office folder does not exists
+	if( !res.GetRow( row ) )
+	{
+		// Create it NOW
+		return NewOfficeFolder(stationID, officeFolderID);
+	}
+	else
+	{
+		officeFolderID = row.GetUInt( 0 );
+	}
+
+	return true;
+}
+
+bool InventoryDB::NewOfficeFolder(uint32 stationID, uint32 &officeFolderID)
+{
+	DBerror err;
+	uint32 id;
+
+	if( !sDatabase.RunQueryLID( err, id,
+		"INSERT INTO entity("
+		" itemName, typeID, ownerID, locationID, flag, contraband, singleton,"
+		" quantity, x, y, z, customInfo "
+		" ) VALUES ( "
+		"'officeFolder', 26, %u, %u, 0, 0, 1, 1, 0, 0, 0, ''"
+		");", stationID, stationID ))
+	{
+		_log(DATABASE__ERROR, "Error in query: %s", err.c_str() );
+		return false;
+	}
+
+	officeFolderID = id;
+
+	return true;
+}
+
+bool InventoryDB::NewOffice(uint32 officeFolderID, uint32 corporationID, uint32 &officeID)
+{
+	DBerror err;
+
+    if (!sDatabase.RunQueryLID(err, officeID,
+        " INSERT INTO entity ("
+        " itemName, typeID, ownerID, locationID, flag, contraband, singleton, "
+        " quantity, x, y, z, customInfo "
+        " ) VALUES ("
+        // office name should be more descriptive
+        // corporation owns the office, station locates the office
+        // x, y, z should be coords of the station?
+        // no extra info
+        " 'office', 27, %u, %u, 0, 0, 1, 1, 0, 0, 0, '' "
+        " ); ", corporationID, officeFolderID ))
+    {
+        codelog(SERVICE__ERROR, "Error in query at ReserveOffice: %s", err.c_str());
+        return false;
+    }
+
+	return true;
+}
 bool InventoryDB::GetItem(uint32 itemID, ItemData &into) {
     DBQueryResult res;
 
@@ -927,7 +1002,8 @@ bool InventoryDB::GetCharacter(uint32 characterID, CharacterData &into) {
         "  chr.careerSpecialityID,"
         "  chr.startDateTime,"
         "  chr.createDateTime,"
-        "  chr.corporationDateTime"
+        "  chr.corporationDateTime,"
+		"  chr.corpAccountKey"
         " FROM character_ AS chr"
         " LEFT JOIN corporation AS crp USING (corporationID)"
         " WHERE characterID = %u",
@@ -964,6 +1040,7 @@ bool InventoryDB::GetCharacter(uint32 characterID, CharacterData &into) {
     into.startDateTime = row.GetUInt64( 18 );
     into.createDateTime = row.GetUInt64( 19 );
     into.corporationDateTime = row.GetUInt64( 20 );
+	into.corpAccountKey = row.GetUInt( 21 );
 
     return true;
 }

@@ -220,7 +220,8 @@ public:
 		uint32 _careerSpecialityID = 0,
 		uint64 _startDateTime = 0,
 		uint64 _createDateTime = 0,
-		uint64 _corporationDateTime = 0);
+		uint64 _corporationDateTime = 0,
+		uint32 _corpAccountKey = 1000);
 
 	uint32 accountID;
 
@@ -251,6 +252,8 @@ public:
 	uint64 startDateTime;
 	uint64 createDateTime;
 	uint64 corporationDateTime;
+
+	uint32 corpAccountKey;
 };
 
 /**
@@ -563,6 +566,8 @@ public:
 	uint64                  createDateTime() const { return m_createDateTime; }
 	uint64                  corporationDateTime() const { return m_corporationDateTime; }
 
+	uint32					corpAccountKey() const { return m_corpAccountKey; }
+
 	void SaveCharacter();
 	void SaveSkillQueue() const;
 	void SaveCertificates() const;
@@ -673,6 +678,8 @@ protected:
 	uint64 m_startDateTime;
 	uint64 m_createDateTime;
 	uint64 m_corporationDateTime;
+
+	uint32 m_corpAccountKey;
 
 	// Skill queue:
 	SkillQueue m_skillQueue;

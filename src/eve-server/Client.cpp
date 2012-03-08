@@ -589,6 +589,7 @@ void Client::_UpdateSession2( uint32 characterID )
     uint32 rolesAtHQ = 0;
     uint32 rolesAtOther = 0;
     uint32 locationID = 0;
+	uint32 corpAccountKey = 0;
 
     ((CharacterService *)(m_services.LookupService("character")))->GetCharacterData( characterID, characterDataMap );
 
@@ -610,6 +611,7 @@ void Client::_UpdateSession2( uint32 characterID )
     rolesAtHQ = characterDataMap["rolesAtHQ"];
     rolesAtOther = characterDataMap["rolesAtOther"];
     locationID = characterDataMap["locationID"];
+	corpAccountKey = characterDataMap["corpAccountKey"];
 
 
     mSession.SetInt( "charid", characterID );
@@ -642,6 +644,7 @@ void Client::_UpdateSession2( uint32 characterID )
     mSession.SetLong( "rolesAtOther", rolesAtOther );
 
     mSession.SetInt( "shipid", locationID );
+	mSession.SetInt( "corpAccountKey", corpAccountKey );
 }
 
 void Client::_SendCallReturn( const PyAddress& source, uint64 callID, PyRep** return_value, const char* channel )
@@ -1815,3 +1818,14 @@ void Client::UpdateSession(const char *sessionType, int value)
 	mSession.SetInt(sessionType, value);
 }
 
+void Client::SetCorpAccountKey( uint32 corpAccountKey, bool update )
+{
+	// Update session with the new wallet key
+	mSession.SetInt( "corpAccountKey", corpAccountKey );
+
+	// Update the DB with the new wallet key
+	if( update )
+		m_services.serviceDB().SetCorpAccountKey( GetChar()->itemID(), corpAccountKey );
+
+	_SendSessionChange();
+}

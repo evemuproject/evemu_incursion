@@ -573,7 +573,9 @@ typedef enum JournalRefType {
 	RefType_corpPayment = 11,
 	RefType_corpRegFee = 39,
 	RefType_officeRentalFee = 13,
-	RefType_playerDonation = 10
+	RefType_playerDonation = 10,
+	RefType_Insurance = 19,
+	RefType_RepairBill = 15
 } JournalRefType;
 
 //from market_keyMap
@@ -588,6 +590,16 @@ typedef enum {
 	accountSales = 3000,
 	accountPurchases = 4000
 } EVEAccountKeys;
+
+// Insurance types( as they appear on the DB )
+typedef enum ShipInsuranceType {
+	insuranceType_Basic = 50 / 100,
+	insuranceType_Standard = 60 / 100,
+	insuranceType_Bronze = 70 / 100,
+	insuranceType_Silver = 80 / 100,
+	insuranceType_Gold = 90 / 100,
+	insuranceType_Platinum = 1
+}ShipInsuranceType;
 
 //the constants are made up of:
 //  prefix     -> cachedObject

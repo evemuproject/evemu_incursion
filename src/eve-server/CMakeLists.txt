@@ -149,14 +149,18 @@ SET( corporation_INCLUDE
      "${TARGET_INCLUDE_DIR}/corporation/CorporationService.h"
      "${TARGET_INCLUDE_DIR}/corporation/CorpRegistryService.h"
      "${TARGET_INCLUDE_DIR}/corporation/CorpStationMgrService.h"
-     "${TARGET_INCLUDE_DIR}/corporation/LPService.h" )
+     "${TARGET_INCLUDE_DIR}/corporation/LPService.h"
+	 "${TARGET_INCLUDE_DIR}/corporation/OfficeFolder.h"
+	 "${TARGET_INCLUDE_DIR}/corporation/Office.h" )
 SET( corporation_SOURCE
      "${TARGET_SOURCE_DIR}/corporation/CorpMgrService.cpp"
      "${TARGET_SOURCE_DIR}/corporation/CorporationDB.cpp"
      "${TARGET_SOURCE_DIR}/corporation/CorporationService.cpp"
      "${TARGET_SOURCE_DIR}/corporation/CorpRegistryService.cpp"
      "${TARGET_SOURCE_DIR}/corporation/CorpStationMgrService.cpp"
-     "${TARGET_SOURCE_DIR}/corporation/LPService.cpp" )
+     "${TARGET_SOURCE_DIR}/corporation/LPService.cpp"
+	 "${TARGET_SOURCE_DIR}/corporation/OfficeFolder.cpp"
+	 "${TARGET_SOURCE_DIR}/corporation/Office.cpp" )
 
 SET( dogmaim_INCLUDE
      "${TARGET_INCLUDE_DIR}/dogmaim/DogmaIMDB.h"

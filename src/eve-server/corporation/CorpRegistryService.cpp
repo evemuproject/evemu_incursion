@@ -67,6 +67,14 @@ public:
         PyCallable_REG_CALL(CorpRegistryBound, GetMember)
         PyCallable_REG_CALL(CorpRegistryBound, GetMembers)
 
+		PyCallable_REG_CALL(CorpRegistryBound, CanViewVotes)
+		PyCallable_REG_CALL(CorpRegistryBound, GetBulletins)
+		PyCallable_REG_CALL(CorpRegistryBound, GetCorporateContacts)
+		PyCallable_REG_CALL(CorpRegistryBound, GetRoles)
+		PyCallable_REG_CALL(CorpRegistryBound, GetRoleGroups)
+		PyCallable_REG_CALL(CorpRegistryBound, GetTitles)
+		PyCallable_REG_CALL(CorpRegistryBound, SetAccountKey)
+
         
     }
     virtual ~CorpRegistryBound() { delete m_dispatch; }
@@ -99,6 +107,14 @@ public:
     PyCallable_DECL_CALL(GetMember)
     PyCallable_DECL_CALL(GetMembers)
 
+	PyCallable_DECL_CALL(CanViewVotes)
+	PyCallable_DECL_CALL(GetBulletins)
+	PyCallable_DECL_CALL(GetCorporateContacts)
+	PyCallable_DECL_CALL(GetRoles)
+	PyCallable_DECL_CALL(GetRoleGroups)
+	PyCallable_DECL_CALL(GetTitles)
+	PyCallable_DECL_CALL(SetAccountKey)
+
     
 
 protected:
@@ -108,6 +124,36 @@ protected:
     CorporationDB& m_db;
 
     Dispatcher *const m_dispatch;
+};
+
+class SparseGetMembersBound
+: public PyBoundObject
+{
+public:
+	PyCallable_Make_Dispatcher(SparseGetMembersBound)
+
+		SparseGetMembersBound( PyServiceMgr *mgr, CorporationDB& db )
+		: PyBoundObject( mgr ),
+		  m_dispatch( new Dispatcher( this ) ),
+		  m_db( db )
+	{
+		_SetCallDispatcher(m_dispatch);
+
+		PyCallable_REG_CALL(SparseGetMembersBound, Fetch)
+	}
+
+	virtual ~SparseGetMembersBound()	{ delete m_dispatch; }
+	virtual void Release()
+	{
+		delete this;
+	}
+	
+	PyCallable_DECL_CALL(Fetch)
+
+protected:
+	Dispatcher *const m_dispatch;
+
+	CorporationDB& m_db;
 };
 
 class SparseCorpOfficeListBound
@@ -217,7 +263,7 @@ PyResult CorpRegistryBound::Handle_AddCorporation( PyCallArgs& call )
 		return new PyInt( 0 );
 	}
 
-    //first make sure the char can even afford it.
+    // first make sure the char can even afford it.
     uint32 corp_costu;
     if(!m_db.GetConstant("corporationStartupCost", corp_costu)) {
         codelog(SERVICE__ERROR, "%s: Failed to determine corporation costs.", call.client->GetName());
@@ -241,7 +287,7 @@ PyResult CorpRegistryBound::Handle_AddCorporation( PyCallArgs& call )
     m_manager->cache_service->InvalidateCache( cache_name );
     PySafeDecRef( cache_name );
 
-    //take the money out of their wallet (sends wallet blink event)
+    // take the money out of their wallet (sends wallet blink event)
     // The amount has to be double!!!
     if(!call.client->AddBalance(double(-corp_cost))) {
         codelog(SERVICE__ERROR, "%s: Failed to take money for corp startup!", call.client->GetName());
@@ -383,8 +429,37 @@ PyClass
       dict["OID+"]=PyDict:1
         dict["N=707075:302"]=0x1CC2383E961BFA8
 */
-PyResult CorpRegistryBound::Handle_GetMembers(PyCallArgs &call) {
-    return NULL;
+PyResult CorpRegistryBound::Handle_GetMembers( PyCallArgs &call )
+{
+	// Its basically the same as GetOffices from this service
+	sLog.Debug( "CorpRegistryBound", "Called GetMembers stub" );
+
+	// First create the bound object
+	PyBoundObject* bound;
+
+	bound = new SparseGetMembersBound(m_manager, m_db);
+
+	if( bound == NULL )
+	{
+		_log(SERVICE__ERROR, "%s: Unable to create bound object for", call.client->GetName() );
+		return NULL;
+	}
+
+	GetMembersSparseRowset ret;
+
+	PyDict* dict = new PyDict();
+
+	// Get the counts
+	uint32 count = m_db.GetMembers( call.client->GetCorporationID() );
+	ret.realRowCount = count;
+
+	dict->SetItemString( "realRowCount", new PyInt( count ) );
+
+	ret.bindedObject = m_manager->BindObject( call.client, bound, &dict );
+
+	PyObject* res = ret.Encode();
+
+	return res;
 }
 
 PyResult CorpRegistryBound::Handle_GetSuggestedTickerNames(PyCallArgs &call) {
@@ -459,6 +534,15 @@ PyResult SparseCorpOfficeListBound::Handle_Fetch(PyCallArgs &call) {
     }
 
     return m_db.Fetch(call.client->GetCorporationID(), args.arg1, args.arg2);
+}
+
+PyResult SparseGetMembersBound::Handle_Fetch( PyCallArgs &call )
+{
+	Call_TwoIntegerArgs args;
+
+	call.tuple->Dump( CLIENT__CALL_DUMP, "FetchGetMembers" );
+
+	return m_db.FetchMembers( call.client->GetCorporationID(), args.arg1, args.arg2 );
 }
 
 PyResult CorpRegistryBound::Handle_GetMyApplications(PyCallArgs &call) {
@@ -936,7 +1020,7 @@ PyResult CorpRegistryBound::Handle_UpdateLogo(PyCallArgs &call) {
     notif.key = call.client->GetCorporationID();
     notif.data = new PyDict();
 
-    double corp_orig = m_db.GetCorpBalance(notif.key);
+    double corp_orig = m_db.GetCorpBalance(notif.key, accountCash);
     if( corp_orig < logo_change )
     {
         _log( SERVICE__ERROR, "%s: Cannot afford corporation logo change costs!", call.client->GetName() );
@@ -957,7 +1041,7 @@ PyResult CorpRegistryBound::Handle_UpdateLogo(PyCallArgs &call) {
 
     //take the money out of their wallet (sends wallet blink event)
     // The amount has to be double!!!
-    if( !m_db.AddBalanceToCorp( notif.key, -logo_change ) )
+    if( !m_db.AddBalanceToCorp( notif.key, -logo_change, accountCash ) )
     {
         codelog( SERVICE__ERROR, "%s: Failed to take money for corp logo change!", call.client->GetName() );
 
@@ -965,7 +1049,7 @@ PyResult CorpRegistryBound::Handle_UpdateLogo(PyCallArgs &call) {
         return new PyNone;
     }
 
-    double corp_new = m_db.GetCorpBalance(notif.key);
+    double corp_new = m_db.GetCorpBalance(notif.key, accountCash);
 
     //record the transaction in the journal.
     if(!m_db.GiveCash(
@@ -1002,4 +1086,85 @@ PyResult CorpRegistryBound::Handle_UpdateLogo(PyCallArgs &call) {
     m_manager->entity_list.Multicast("OnCorporationChanged", "corpid", &answer, mct);
 
     return m_db.GetCorporation(notif.key);
+}
+
+PyResult CorpRegistryBound::Handle_CanViewVotes( PyCallArgs& call )
+{
+	sLog.Debug( "CorpRegistryBound", "Called CanViewNotes stub." );
+
+	call.tuple->Dump( CLIENT__CALL_DUMP, "CanViewVotes" );
+
+	return new PyBool( false );
+}
+
+PyResult CorpRegistryBound::Handle_GetBulletins( PyCallArgs& call )
+{
+	sLog.Debug( "CorpRegistryBound", "Called GetBulletins stub." );
+
+	call.tuple->Dump( CLIENT__CALL_DUMP, "GetBulletins" );
+
+	return m_db.GetBulletins( call.client->GetCorporationID() );
+}
+
+PyResult CorpRegistryBound::Handle_GetCorporateContacts( PyCallArgs& call )
+{
+	sLog.Debug( "CorpRegistryBound", "Called GetCorporateContacts stub." );
+
+	call.tuple->Dump( CLIENT__CALL_DUMP, "GetCorporateContacts" );
+
+	// Send a dummy to the client
+	DBRowDescriptor *header = new DBRowDescriptor();
+	header->AddColumn("contactID", DBTYPE_I4);
+	header->AddColumn("inWatchList", DBTYPE_BOOL);
+	header->AddColumn("relationshipID", DBTYPE_R8);
+	header->AddColumn("labelMask", DBTYPE_I8);
+	CRowSet *rowset = new CRowSet( &header );
+
+	PyDict* dict = new PyDict();
+	dict->SetItemString("addresses", rowset);
+	dict->SetItemString("blocked", rowset);
+	PyObject *keyVal = new PyObject( "util.KeyVal", dict);
+
+	return keyVal;
+}
+
+PyResult CorpRegistryBound::Handle_GetRoles( PyCallArgs& call )
+{
+	sLog.Debug( "CorpRegistryBound", "Called GetRoles stub." );
+
+	return m_db.GetRoles( call.client->GetCorporationID() );
+}
+
+PyResult CorpRegistryBound::Handle_GetRoleGroups( PyCallArgs& call )
+{
+	sLog.Debug( "CorpRegistryBound", "Called GetRoleGroups stub." );
+
+	return m_db.GetRoleGroups( call.client->GetCorporationID() );
+}
+
+PyResult CorpRegistryBound::Handle_GetTitles( PyCallArgs& call )
+{
+	sLog.Debug( "CorpRegistryBound", "Called GetTitles stub." );
+
+	return m_db.GetTitles( call.client->GetCorporationID() );
+}
+
+PyResult CorpRegistryBound::Handle_SetAccountKey( PyCallArgs& call )
+{
+	sLog.Debug( "CorpRegistryBound", "Called SetAccountKey stub." );
+
+	uint32 corpAccountKey = 0;
+
+	if( call.tuple->GetItem( 0 )->IsInt() )
+	{
+		corpAccountKey = call.tuple->GetItem( 0 )->AsInt()->value();
+	}
+	else
+	{
+		corpAccountKey = 1000;
+	}
+
+	call.client->SetCorpAccountKey( corpAccountKey );
+
+	return NULL;
 }

@@ -145,14 +145,31 @@ PyResult InsuranceBound::Handle_GetContracts( PyCallArgs& call )
 PyResult InsuranceBound::Handle_InsureShip( PyCallArgs& call )
 {
 	Call_InsureShip args;
+	bool ignoreOld = false;
 
-	if( !args.Decode( call.tuple ) )
+	if( call.byname.find( "voidOld" ) != call.byname.end() )
 	{
-		_log(SERVICE__ERROR, "Wrong parameters to InsureShip" );
-		return new PyBool( false );
+		ignoreOld = call.byname.find( "voidOld" )->second->AsBool()->value();
 	}
 
-	printf( "shipID: %d cost: %f type: %d\n", args.shipID, args.cost, args.type );
+	if( !args.Decode( &call.tuple ) )
+	{
+		_log(SERVICE__ERROR, "Wrong parameters to InsureShip" );
+
+		// Create an exception to let the client know that the insurance was unsucesful
+		throw PyException( MakeUserError( "InsureShipFailed" ) );
+	}
+
+	if( ( !ignoreOld ) && ( m_db->IsShipInsured( args.shipID ) ) )
+	{
+		// Create InsureShipFailedSingleContract exception
+		std::map<std::string, PyRep *> res;
+
+		res[ "ownerName" ] = new PyString( m_manager->item_factory.GetOwner( m_manager->item_factory.GetItem( args.shipID )->ownerID() )->itemName() );
+
+		throw PyException( MakeUserError( "InsureShipFailedSingleContract", res ) );
+		// A contract for that ship already exists, notify it to the client
+	}
 
 	double baseprice = m_manager->item_factory.GetItem( args.shipID )->type().basePrice();
 	double fraction = 0;
@@ -184,7 +201,13 @@ PyResult InsuranceBound::Handle_InsureShip( PyCallArgs& call )
 	if( fraction == 0 )
 	{
 		codelog( CLIENT__ERROR, "Cannot calculate fraction for insurance. Aborting..." );
-		return new PyBool( false );
+		throw PyException( MakeUserError( "InsureShipFailed" ) );
+	}
+
+	if( m_manager->item_factory.GetItem( args.shipID )->singleton() == false )
+	{
+		call.client->SendInfoModalMsg( "You can't insure repackaged ships..." );
+		throw PyException( MakeUserError( "InsureShipFailed" ) );
 	}
 
 	if( call.client->GetChar()->balance() > args.cost )
@@ -192,13 +215,7 @@ PyResult InsuranceBound::Handle_InsureShip( PyCallArgs& call )
 	else
 	{
 		call.client->SendInfoModalMsg( "You don't have enough ISK to insure this ship with this insurance type." );
-		return new PyBool( false );
-	}
-
-	if( m_manager->item_factory.GetItem( args.shipID )->singleton() == false )
-	{
-		call.client->SendInfoModalMsg( "You can't insure repackaged ships..." );
-		return new PyBool( false );
+		throw PyException( MakeUserError( "InsureShipFailed" ) );
 	}
 
 	std::string reason = "Insurance fee for ";
@@ -220,8 +237,11 @@ PyResult InsuranceBound::Handle_InsureShip( PyCallArgs& call )
 	{
 		codelog(CLIENT__ERROR, "Failed to record insurance transaction." );
 	}
-	
-	return new PyBool( m_db->InsureShip( args.shipID, call.client->GetCharacterID(), fraction ) );
+
+	m_db->InsureShip( args.shipID, call.client->GetCharacterID(), fraction );
+
+	// We shouldn't return anything
+	return NULL;
 }
 
 
@@ -235,7 +255,10 @@ PyResult InsuranceBound::Handle_UnInsureShip( PyCallArgs& call )
 		return new PyBool( false );
 	}
 
-	return new PyBool( m_db->UnInsureShip( arg.arg, call.client->GetCharacterID() ) );
+	m_db->UnInsureShip( arg.arg );
+
+	// We shouldn't return anything
+	return NULL;
 }
 
 PyResult InsuranceBound::Handle_GetInsurancePrice( PyCallArgs& call )

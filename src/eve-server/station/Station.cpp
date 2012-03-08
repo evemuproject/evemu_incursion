@@ -135,6 +135,12 @@ Station::Station(
   m_reprocessingStationsTake(_stData.reprocessingStationsTake),
   m_reprocessingHangarFlag(_stData.reprocessingHangarFlag)
 {
+	// Maybe this can be done elsewhere
+	uint32 officeFolderID = 0;
+	assert( _factory.db().GetOfficeFolder(_stationID, officeFolderID) ); // This CAN'T fail
+
+	// Load the Item
+	m_officeFolder = InventoryItem::Load<OfficeFolder>( _factory, officeFolderID );
 }
 
 StationRef Station::Load(ItemFactory &factory, uint32 stationID)

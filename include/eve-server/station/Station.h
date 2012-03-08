@@ -209,6 +209,7 @@ public:
 	EVEItemFlags    reprocessingHangarFlag() const { return m_reprocessingHangarFlag; }
 
     StationType *   GetStationType() { return &m_stationType; }
+	OfficeFolderRef GetOfficeFolder() { return m_officeFolder; }
 
 protected:
 	Station(
@@ -283,6 +284,7 @@ protected:
 	double m_reprocessingEfficiency;
 	double m_reprocessingStationsTake;
 	EVEItemFlags m_reprocessingHangarFlag;
+	OfficeFolderRef m_officeFolder;
 };
 
 

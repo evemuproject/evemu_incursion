@@ -82,6 +82,14 @@ Inventory *Inventory::Cast(InventoryItemRef item)
         case EVEDB::invGroups::Solar_System:    return SolarSystemRef::StaticCast( item ).get();
     }
 
+	switch( item->typeID() )
+	{
+		case 26: // Office folder
+			return OfficeFolderRef::StaticCast( item ).get();
+		case 27:
+			return OfficeRef::StaticCast( item ).get();
+	}
+
     // maybe add extra debug info on what for type or item.
     sLog.Error("Inventory::Cast()", "Item cast not supported for item typeID = %u, groupID = %u, categoryID = %u", item->typeID(), item->groupID(), item->categoryID() );
     return NULL;

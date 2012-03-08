@@ -204,6 +204,22 @@ void EntityList::FindByRegionID(uint32 regionID, std::vector<Client *> &result) 
 	}
 }
 
+void EntityList::FindByCorporationID( uint32 corporationID, std::vector<Client *> &result ) const
+{
+	client_list::const_iterator cur, end;
+
+	cur = m_clients.begin();
+	end = m_clients.end();
+
+	for( ; cur != end; cur ++ )
+	{
+		if( (*cur)->GetCorporationID() == corporationID )
+		{
+			result.push_back( *cur );
+		}
+	}
+}
+
 void EntityList::Broadcast(const char *notifyType, const char *idType, PyTuple **payload) const {
 	//build a little notification out of it.
 	EVENotificationStream notify;

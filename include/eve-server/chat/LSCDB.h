@@ -90,6 +90,7 @@ public:
     int RemoveChannelSubscriptionFromDatabase(uint32 channelID, uint32 charID);
     int RemoveChannelFromDatabase(uint32 channelID);
 
+	bool IsCharacterOnline( uint32 characterID );
 protected:
 	std::string GetChannelName(uint32 id, const char * table, const char * column, const char * key);
 };

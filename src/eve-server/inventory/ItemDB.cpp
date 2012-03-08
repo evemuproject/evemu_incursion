@@ -90,6 +90,7 @@ PyRep *ItemDB::ListItems( uint32 characterID )
 		" flag AS flagID,"
 		" singleton,"
 		" contraband,"
+		" ownerID,"
 		" invGroups.categoryID,"
 		" invTypes.groupID"
 		" FROM entity"

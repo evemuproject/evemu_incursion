@@ -52,6 +52,8 @@ public:
     PyObject *ListStationCorps(uint32 station_id);
     PyObject *ListStationOwners(uint32 station_id);
 
+	PyObjectEx* GetBulletins( uint32 corporationID );
+
     PyDict *ListAllCorpInfo();
     PyObject *ListNPCDivisions();
     bool ListAllCorpFactions(std::map<uint32, uint32> &into);
@@ -71,6 +73,7 @@ public:
 
     uint32 GetQuoteForRentingAnOffice(uint32 corpID);
     uint32 ReserveOffice(const OfficeInfo & oInfo);
+	uint32 GetStationOfficeFolder( uint32 stationID );
 
     uint32 GetStationOwner(uint32 stationID);
     uint32 GetStationCorporationCEO(uint32 stationID);
@@ -90,6 +93,16 @@ public:
 	
 	bool ChangeCloneType(uint32 characterID, uint32 typeID);
 
+	bool SetCorporationHQ( uint32 corporationID, uint32 stationID );
+	int GetCorporationHQ( uint32 corporationID );
+
+	PyRep* GetTitles( uint32 corpID );
+	uint32 GetMembers( uint32 corpID );
+	PyRep* FetchMembers( uint32 corpID, uint32 from, uint32 count );
+	PyRep* GetRoles( uint32 corpID );
+	PyRep* GetRoleGroups( uint32 corpID );
+
+	PyRep* GetRecruitmentAdsByCriteria( uint32 regionID, double skillPoints, uint32 typeMask, uint32 raceMask, uint32 isInAlliance, uint32 minMembers, uint32 maxMembers );
 protected:
 };
 

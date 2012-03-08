@@ -216,17 +216,50 @@ PyResult CorporationService::Handle_GetRecruitmentAdTypes( PyCallArgs& call )
 
 PyResult CorporationService::Handle_GetRecruitmentAdsByCriteria( PyCallArgs& call )
 {
-	//this is cached on live with check "5 minutes"
+	// Cached on live 5 seconds
+	// Manual decoding of args because the skillpoints can be real and/or integer
 
-	Call_GetRecruitmentAdsByCriteria args;
-	if( !args.Decode( &call.tuple ) )
-    {
-		_log( SERVICE__ERROR, "Failed to decode args." );
+	sLog.Debug( "CorporationService", "Called GetRecruitmentAdsByCriteria stub." );
+
+	uint32 regionID = 0;
+	uint32 typeMask = 0;
+	uint32 raceMask = 0;
+	uint32 isInAlliance = 0;
+	uint32 minMembers = 0;
+	uint32 maxMembers = 0;
+	PyRep* skillPoints = NULL; // This would help us alot
+
+	// Decode the args
+	if( !call.tuple->GetItem( 0 )->IsInt() )
+	{
+		sLog.Error( "CorporationService", "Wrong item 0 type, expected Int but got %s", call.tuple->GetItem( 0 )->TypeString() );
 		return NULL;
 	}
 
-    sLog.Debug( "CorporationService", "Called GetRecruitmentAdsByCriteria stub." );
+	if( ( !call.tuple->GetItem( 1 )->IsInt() ) && ( !call.tuple->GetItem( 1 )->IsFloat() ) )
+	{
+		sLog.Error( "CorporationService", "Wrong item 1 type, expected Int or Float but got %s", call.tuple->GetItem( 1 )->TypeString() );
+		return NULL;
+	}
 
+	// Check the next 6
+	for( size_t i = 0; i < 5; i ++ )
+	{
+		if( !call.tuple->GetItem( i + 2 )->IsInt() )
+		{
+			sLog.Error( "CorporationService", "Wrong item %i type, expected Int but got %s", i + 2, call.tuple->GetItem( i + 2 )->TypeString() );
+			return NULL;
+		}
+	}
+
+	regionID = call.tuple->GetItem( 0 )->AsInt()->value();
+	skillPoints = call.tuple->GetItem( 1 );
+	typeMask = call.tuple->GetItem( 2 )->AsInt()->value();
+	raceMask = call.tuple->GetItem( 3 )->AsInt()->value();
+	isInAlliance = call.tuple->GetItem( 4 )->AsInt()->value();
+	minMembers = call.tuple->GetItem( 5 )->AsInt()->value();
+	maxMembers = call.tuple->GetItem( 6 )->AsInt()->value();
+	/*
 	util_Rowset rs;
 
 	rs.header.push_back( "adID" );
@@ -242,7 +275,17 @@ PyResult CorporationService::Handle_GetRecruitmentAdsByCriteria( PyCallArgs& cal
 	rs.header.push_back( "skillPoints" );
 	rs.header.push_back( "channelID" );
 
-	return rs.Encode();
+	return rs.Encode();*/
+	return m_db.GetRecruitmentAdsByCriteria(
+		regionID,
+		( skillPoints->IsInt() ) ? (double)skillPoints->AsInt()->value() : skillPoints->AsFloat()->value(),
+		typeMask,
+		raceMask,
+		isInAlliance,
+		minMembers,
+		maxMembers
+	);
+
 }
 
 

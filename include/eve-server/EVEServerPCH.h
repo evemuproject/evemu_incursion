@@ -209,6 +209,8 @@
 #include "corporation/CorpRegistryService.h"
 #include "corporation/CorpStationMgrService.h"
 #include "corporation/LPService.h"
+#include "corporation/OfficeFolder.h"
+#include "corporation/Office.h"
 
 // dogma crap dono what this is
 #include "dogmaim/DogmaIMDB.h"

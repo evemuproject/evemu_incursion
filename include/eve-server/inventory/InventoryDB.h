@@ -137,6 +137,15 @@ public:
 	bool GetStationType(uint32 stationTypeID, StationTypeData &into);
 
 	/*
+	 * Loads an OfficeFolder
+	 *
+	 * @param[in] stationID ID of station's office folder to load
+	 * @param[in] officeFolderID output of the officeFolderID
+	 * @return True if load succeeded, false if not.
+	 */
+	bool GetOfficeFolder( uint32 stationID, uint32 &officeFolderID );
+
+	/*
 	 * Type attribute stuff
 	 * (dgmTypeAttributes)
 	 */
@@ -190,6 +199,12 @@ public:
 	bool NewBlueprint(uint32 blueprintID, const BlueprintData &data);
 	bool SaveBlueprint(uint32 blueprintID, const BlueprintData &data);
 	bool DeleteBlueprint(uint32 blueprintID);
+
+	/*
+	 * Offices stuff
+	 */
+	bool NewOfficeFolder(uint32 stationID, uint32 &officeFolderID);
+	bool NewOffice(uint32 officeFolderID, uint32 corporationID, uint32 &officeID);
 
 	/*
 	 * Character stuff

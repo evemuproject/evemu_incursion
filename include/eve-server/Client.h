@@ -123,6 +123,7 @@ public:
 
 	uint32 GetShipID() const                        { return mSession.GetCurrentInt( "shipid" ); }
     uint32 GetGangRole() const                      { return mSession.GetCurrentInt( "gangrole" ); }
+	uint32 GetCorpAccountKey() const				{ return mSession.GetCurrentInt( "corpAccountKey"); }
 
 	// character data
 	CharacterRef GetChar() const                    { return m_char; }
@@ -153,6 +154,7 @@ public:
 	void SavePosition();
     void SaveAllToDatabase();
 	void UpdateSkillTraining();
+	void SetCorpAccountKey( uint32 corpAccountKey, bool update = true );
 	
 	double GetPropulsionStrength() const;
 	

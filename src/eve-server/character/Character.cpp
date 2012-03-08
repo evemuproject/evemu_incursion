@@ -138,7 +138,8 @@ CharacterData::CharacterData(
     uint32 _careerSpecialityID,
     uint64 _startDateTime,
     uint64 _createDateTime,
-    uint64 _corporationDateTime)
+    uint64 _corporationDateTime,
+	uint32 _corpAccountKey)
 : accountID(_accountID),
   title(_title),
   description(_desc),
@@ -161,7 +162,8 @@ CharacterData::CharacterData(
   careerSpecialityID(_careerSpecialityID),
   startDateTime(_startDateTime),
   createDateTime(_createDateTime),
-  corporationDateTime(_corporationDateTime)
+  corporationDateTime(_corporationDateTime),
+  corpAccountKey(_corpAccountKey)
 {
 }
 
@@ -335,7 +337,8 @@ Character::Character(
   m_careerSpecialityID(_charData.careerSpecialityID),
   m_startDateTime(_charData.startDateTime),
   m_createDateTime(_charData.createDateTime),
-  m_corporationDateTime(_charData.corporationDateTime)
+  m_corporationDateTime(_charData.corporationDateTime),
+  m_corpAccountKey(_charData.corpAccountKey)
 {
     // allow characters to be only singletons
     assert(singleton() && quantity() == 1);

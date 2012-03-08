@@ -75,6 +75,7 @@ public:
 	Client *FindAccount(uint32 account_id) const;
         void FindByStationID(uint32 stationID, std::vector<Client *> &result) const;
         void FindByRegionID(uint32 regionID, std::vector<Client *> &result) const;
+		void FindByCorporationID( uint32 corporationID, std::vector<Client *> &result ) const;
 	uint32 GetClientCount() const { return(uint32(m_clients.size())); }
 
 	SystemManager *FindOrBootSystem(uint32 systemID);

@@ -184,6 +184,16 @@ CelestialObjectRef ItemFactory::GetCelestialObject(uint32 celestialID)
     return _GetItem<CelestialObject>( celestialID );
 }
 
+OfficeRef ItemFactory::GetOffice( uint32 officeID )
+{
+	return _GetItem<Office>( officeID );
+}
+
+OfficeFolderRef ItemFactory::GetOfficeFolder( uint32 officeFolderID )
+{
+	return _GetItem<OfficeFolder>( officeFolderID );
+}
+
 SolarSystemRef ItemFactory::GetSolarSystem(uint32 solarSystemID)
 {
     return _GetItem<SolarSystem>( solarSystemID );

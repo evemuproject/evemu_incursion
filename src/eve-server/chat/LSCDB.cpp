@@ -922,3 +922,27 @@ int LSCDB::RemoveChannelFromDatabase(uint32 channelID)
 
 	return ret;
 }
+
+bool LSCDB::IsCharacterOnline( uint32 characterID )
+{
+	DBQueryResult res;
+	DBResultRow row;
+
+	if( !sDatabase.RunQuery( res,
+		"SELECT online,"
+		" 0 AS isCorpOrAllianceContact"
+		" FROM character_"
+		" WHERE characterID = %u", characterID ) )
+	{
+		codelog( SERVICE__ERROR, "Error in query: %s", res.error.c_str() );
+		return false;
+	}
+
+	if( !res.GetRow( row ) )
+	{
+		_log( DATABASE__ERROR, "Cant fetch online status for character %u", characterID );
+		return false;
+	}
+
+	return row.GetBool( 0 );
+}

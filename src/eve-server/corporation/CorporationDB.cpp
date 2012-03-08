@@ -47,17 +47,14 @@ PyObject *CorporationDB::ListStationOffices(uint32 station_id) {
     DBQueryResult res;
 
     if(!sDatabase.RunQuery(res,
-        "SELECT "
-        "   corporationID, itemID, officeFolderID"
-        " FROM crpOffices"
-        " WHERE officeFolderID=%u",
-//TODO: new a new DBSequence for this ID
-            station_id + 6000000
-    ))
-    {
-        codelog(SERVICE__ERROR, "Error in query: %s", res.error.c_str());
-        return NULL;
-    }
+		"SELECT "
+		"	corporationID, itemID, officeFolderID"
+		" FROM crpOffices"
+		" WHERE stationID=%u", station_id ))
+	{
+		codelog(SERVICE__ERROR, "Error in query: %s", res.error.c_str() );
+		return NULL;
+	}
 
     return DBResultToRowset(res);
 }
@@ -325,6 +322,8 @@ static std::string _IoN( PyRep* r )
     return itoa( r->AsInt()->value() );
 }
 
+
+// Now EVE Online needs a item in the entity table to hold an inventory for a corporation
 bool CorporationDB::AddCorporation(Call_AddCorporation & corpInfo, uint32 charID, uint32 stationID, uint32 & corpID) {
     DBerror err;
     corpID = 0;
@@ -335,35 +334,39 @@ bool CorporationDB::AddCorporation(Call_AddCorporation & corpInfo, uint32 charID
     sDatabase.DoEscapeString(cTick, corpInfo.corpTicker);
     sDatabase.DoEscapeString(cURL, corpInfo.url);
 
+	// We need to add this in order to use the assets window
+	if( !sDatabase.RunQueryLID( err, corpID,
+		" INSERT INTO entity ( "
+		" itemName, typeID, ownerID, locationID, "
+		" flag, contraband, singleton, quantity, x, y, z, "
+		" custominfo ) VALUES ( "
+		"'%s', 2, %u, %u, 0, 0, 1, 1, 0, 0, 0, '')", cName.c_str(), charID, stationID ))
+	{
+		codelog(SERVICE__ERROR, "Error adding corporation to entity table. Aborting AddCorporation. Error: %s", err.c_str() );
+		return false;
+	}
+
     //TODO: we should be able to get our race ID directly from our Client
     //object eventually, instead of pulling it from this join.
-    if (!sDatabase.RunQueryLID(err, corpID,
+    if (!sDatabase.RunQuery(err,
         " INSERT INTO corporation ( "
-        "   corporationName, description, tickerName, url, "
+        "   corporationID, corporationName, description, tickerName, url, "
         "   taxRate, minimumJoinStanding, corporationType, hasPlayerPersonnelManager, sendCharTerminationMessage, "
         "   creatorID, ceoID, stationID, raceID, allianceID, shares, memberCount, memberLimit, "
         "   allowedMemberRaceIDs, graphicID, color1, color2, color3, shape1, shape2, shape3, "
-<<<<<<< HEAD
         "   typeface, isRecruiting "
-=======
-        "   typeface, isRecruiting, creatorID "
->>>>>>> 20d496aa1b213346c2369cc60bf1048c00c941e4
         "   ) "
         " SELECT "
-        "       '%s', '%s', '%s', '%s', "
+        "       %u, '%s', '%s', '%s', '%s', "
         "       %lf, 0, 2, 0, 1, "
         "       %u, %u, %u, chrBloodlines.raceID, 0, 1000, 0, 10, "
         "       chrBloodlines.raceID, 0, %s, %s, %s, %s, %s, %s, "
-<<<<<<< HEAD
         "       NULL, %u "
-=======
-        "       NULL, %u, %u "
->>>>>>> 20d496aa1b213346c2369cc60bf1048c00c941e4
         "    FROM entity "
         "       LEFT JOIN bloodlineTypes USING (typeID) "
         "       LEFT JOIN chrBloodlines USING (bloodlineID) "
         "    WHERE entity.itemID = %u ",
-        cName.c_str(), cDesc.c_str(), cTick.c_str(), cURL.c_str(),
+        corpID, cName.c_str(), cDesc.c_str(), cTick.c_str(), cURL.c_str(),
         corpInfo.taxRate,
         charID, charID, stationID,
         _IoN(corpInfo.color1).c_str(),
@@ -373,10 +376,6 @@ bool CorporationDB::AddCorporation(Call_AddCorporation & corpInfo, uint32 charID
         _IoN(corpInfo.shape2).c_str(),
         _IoN(corpInfo.shape3).c_str(),
 		corpInfo.membershipEnabled,
-<<<<<<< HEAD
-=======
-		charID,
->>>>>>> 20d496aa1b213346c2369cc60bf1048c00c941e4
         charID))
     {
         codelog(SERVICE__ERROR, "Error in query: %s", err.c_str());
@@ -414,6 +413,107 @@ bool CorporationDB::AddCorporation(Call_AddCorporation & corpInfo, uint32 charID
         // This is not a serious problem either, but would be good if the channel
         // were working...
     }
+
+	// Add titles to the Database
+	std::vector<uint32> titles;
+	std::string nameBase = "corpTitle";
+
+	for( size_t i = 0; i <= 15; i ++ )
+	{
+		std::string name = nameBase + itoa( i + 1 );
+		uint32 tmp = 0;
+
+		GetConstant( name.c_str(), tmp );
+
+		titles.push_back( tmp );
+	}
+
+	std::string query = "INSERT INTO crpTitles(corporationID, titleID)VALUES";
+
+	for( size_t i = 0; i <= 15; i ++ )
+	{
+		std::string tmp = "";
+
+		sprintf( tmp, "(%u, %u)", corpID, titles[ i ] );
+
+		if( i < 15 )
+			tmp += ",";
+
+		query += tmp;
+	}
+
+	if( !sDatabase.RunQuery( err, query.c_str() ) )
+	{
+		codelog(SERVICE__ERROR, "Error in query: %s", err.c_str() );
+		return false;
+	}
+
+	// Add the needed corp roles
+	// We get this from the eveconstants table, but the CEO can change them
+	// So we need this to let the CEO change them if desired
+	// Also seems that the roleID from crproles is roleMask from crprolegroups
+	// Really confusing, isn't it ? ;)
+
+	// The fastest way to do this is to copy any corpRole* constant from eveconstants
+	// I don't have an EVE account to check this, so I can't ensure that this is what
+	// original eve server does, but if it works, who cares ? :P
+
+	// Do direct copy...
+	if( !sDatabase.RunQuery(err,
+		"INSERT INTO crpRoles("
+		" corporationID,"
+		" roleID,"
+		" roleName,"
+		" roleMask"
+		") SELECT"
+		"%u,"
+		" constantValue,"
+		" constantID,"
+		" constantValue"
+		" FROM eveconstants"
+		" WHERE constantID LIKE '%corpRole%'", corpID ))
+	{
+		// Critical error, what should we do ?
+		codelog(DATABASE__ERROR, "Error in query: %s", err.c_str() );
+		return false;
+	}
+
+	// The crpRoleGroups is a bit difficult
+	// A crpRoleGroups entry can have more than one role assigned
+	// This is what roleMask is designed for
+	// if ((role.roleID & roleGroup.roleMask) == role.roleID):
+	// But the problem now is, what default data should we add to the table crpRoleGroups ?
+	// Its not a good idea to add a copy of the crpRoles as this will create 53 groups
+	// per corporation, with only one role assigned, this can confuse the corp CEO
+	// Also, only one crpRoleGroup entry per corp by default is not a good idea though
+	// I thought that this data was in eveConstants, but it isnt there, so lets create it ;)
+	// By the moment we should create some basic role groups, what about those?:
+	/*
+		* roleGroupID *	  roleMask * isDivisional *
+		*			1 *	 1 | 2 | 3 *		false *
+		*			2 *		  8064 *		false *
+		*			4 *	 134209536 *		false *
+		*			8 * 4160749568 *		false *
+		*		   16 * 4294967295 *		false *
+	*/
+	// roleGroupID should be a bitMask,
+	// roleMask is a bitMask of roleIDs
+
+	if( !sDatabase.RunQuery( err,
+		"INSERT INTO crpRoleGroups("
+		" corporationID,"
+		" roleGroupID,"
+		" roleMask,"
+		" isDivisional"
+		")VALUES(%u, 1, 3, 0),"
+		"(%u, 2, 8064, 0),"
+		"(%u, 4, 134209536, 0),"
+		"(%u, 8, 4160749568, 0),"
+		"(%u, 16, 4294967295, 0)", corpID, corpID, corpID, corpID, corpID ))
+	{
+		codelog(DATABASE__ERROR, "Error in query: %s", err.c_str() );
+		return false;
+	}
 
     return true;
 }
@@ -856,12 +956,42 @@ uint32 CorporationDB::GetQuoteForRentingAnOffice(uint32 stationID) {
 }
 // Need to find out wether there is any kind of limit regarding the offices
 uint32 CorporationDB::ReserveOffice(const OfficeInfo & oInfo) {
+	// Check if the station has an office folder, if not, add it
+	DBQueryResult res;
+	DBResultRow row;
+	DBerror err;
+
+	if( !sDatabase.RunQuery( res,
+		"SELECT itemID"
+		" FROM entity"
+		" WHERE locationID=%u"
+		" AND typeID=26", oInfo.stationID ) )
+	{
+		_log(DATABASE__ERROR, "Error in query: %s", res.error.c_str() );
+		return 0;
+	}
+
+	uint32 officeFolderID = 0;
+
+	if( !res.GetRow( row ) )
+	{
+		// Ok, no officeFolder, create it
+		if( !sDatabase.RunQueryLID( err, officeFolderID,
+			"INSERT INTO entity("
+			" itemName, typeID, ownerID, locationID, flag, contraband, singleton,"
+			" quantity, x, y, z, customInfo "
+			" ) VALUES ( "
+			"'officeFolder', 26, %u, %u, 0, 0, 1, 1, 0, 0, 0, ''"
+			");", oInfo.stationID, oInfo.stationID ))
+		{
+			_log(DATABASE__ERROR, "Error in query: %s", err.c_str() );
+			return 0;
+		}
+	}
     // oInfo should at this point contain the station, officeFolder and corporation infos
 
     // First check if we have a free office at this station at all...
     // Instead, assume that there is, and add one for this corporation
-    DBerror err;
-
     // First add it into the entity table
     uint32 officeID = 0;
     if (!sDatabase.RunQueryLID(err, officeID,
@@ -874,10 +1004,10 @@ uint32 CorporationDB::ReserveOffice(const OfficeInfo & oInfo) {
         // x, y, z should be coords of the station?
         // no extra info
         " 'office', 27, %u, %u, 0, 0, 1, 1, 0, 0, 0, '' "
-        " ); ", oInfo.corporationID, oInfo.stationID ))
+        " ); ", oInfo.corporationID, officeFolderID ))
     {
         codelog(SERVICE__ERROR, "Error in query at ReserveOffice: %s", err.c_str());
-        return(0);
+        return 0;
     }
 
     // inserts with the id gotten previously
@@ -886,16 +1016,39 @@ uint32 CorporationDB::ReserveOffice(const OfficeInfo & oInfo) {
         " (corporationID, stationID, itemID, typeID, officeFolderID) "
         " VALUES "
         " (%u, %u, %u, %u, %u) ",
-        oInfo.corporationID, oInfo.stationID, officeID, oInfo.typeID, oInfo.officeFolderID))
+        oInfo.corporationID, oInfo.stationID, officeID, oInfo.typeID, officeFolderID))
     {
         codelog(SERVICE__ERROR, "Error in query at ReserveOffice: %s", err.c_str());
         // Ensure that officeID stays 0, whatever the RunQueryLID done...
-        return(0);
+        return 0;
     }
 
     // If insert is successful, oInfo.officeID now contains the rented office's ID
     // Nothing else to do...
-    return(officeID);
+    return officeID;
+}
+
+// Get the officeFolderID for a station
+uint32 CorporationDB::GetStationOfficeFolder( uint32 stationID )
+{
+	DBQueryResult res;
+	DBResultRow row;
+
+	if( !sDatabase.RunQuery( res,
+		"SELECT itemID"
+		" FROM entity"
+		" WHERE typeID=26"
+		" AND locationID=%u"
+		" AND ownerID=%u", stationID, stationID ))
+	{
+		_log(DATABASE__ERROR, "Error in query: %s", res.error.c_str() );
+		return 0;
+	}
+
+	if( !res.GetRow( row ) )
+		return 0;
+	
+	return row.GetUInt( 0 );
 }
 
 //NOTE: it makes sense to push this up to ServiceDB, since others will likely need this too.
@@ -1156,46 +1309,55 @@ bool CorporationDB::CreateMemberAttributeUpdate(MemberAttributeUpdate & attrib, 
 bool CorporationDB::UpdateDivisionNames(uint32 corpID, const Call_UpdateDivisionNames & divs, PyDict * notif) {
     DBQueryResult res;
 
-    if (!sDatabase.RunQuery(res,
+    if( !sDatabase.RunQuery( res,
         " SELECT "
-        " division1, division2, division3, division4, division5, division6, division7 "
+        " division1, division2, division3, division4, division5, division6, division7, "
+		" walletDivision2, walletDivision3, walletDivision4, walletDivision5, walletDivision6, walletDivision7 "
         " FROM corporation "
-        " WHERE corporationID = %u ", corpID))
+        " WHERE corporationID = %u ", corpID ) )
     {
-        codelog(SERVICE__ERROR, "Error in query: %s", res.error.c_str());
+        codelog( SERVICE__ERROR, "Error in query: %s", res.error.c_str() );
         return false;
     }
 
     DBResultRow row;
-    if (!res.GetRow(row)) {
-        _log(DATABASE__ERROR, "Corporation %u doesn't exists.", corpID);
+    if( !res.GetRow( row ) )
+	{
+        _log( DATABASE__ERROR, "Corporation %u doesn't exists.", corpID );
         return false;
     }
 
     // We are here, so something must have changed...
     std::vector<std::string> dbQ;
-    ProcessStringChange("division1", row.GetText(0), divs.div1, notif, dbQ);
-    ProcessStringChange("division2", row.GetText(1), divs.div2, notif, dbQ);
-    ProcessStringChange("division3", row.GetText(2), divs.div3, notif, dbQ);
-    ProcessStringChange("division4", row.GetText(3), divs.div4, notif, dbQ);
-    ProcessStringChange("division5", row.GetText(4), divs.div5, notif, dbQ);
-    ProcessStringChange("division6", row.GetText(5), divs.div6, notif, dbQ);
-    ProcessStringChange("division7", row.GetText(6), divs.div7, notif, dbQ);
+    ProcessStringChange("division1",		   row.GetText( 0), divs.div1, notif, dbQ);
+    ProcessStringChange("division2",		   row.GetText( 1), divs.div2, notif, dbQ);
+    ProcessStringChange("division3",		   row.GetText( 2), divs.div3, notif, dbQ);
+    ProcessStringChange("division4",		   row.GetText( 3), divs.div4, notif, dbQ);
+    ProcessStringChange("division5",		   row.GetText( 4), divs.div5, notif, dbQ);
+    ProcessStringChange("division6",		   row.GetText( 5), divs.div6, notif, dbQ);
+    ProcessStringChange("division7",		   row.GetText( 6), divs.div7, notif, dbQ);
+	ProcessStringChange("walletDivision2",     row.GetText( 8), divs.wal2, notif, dbQ);
+	ProcessStringChange("walletDivision3",     row.GetText( 9), divs.wal3, notif, dbQ);
+	ProcessStringChange("walletDivision4",     row.GetText(10), divs.wal4, notif, dbQ);
+	ProcessStringChange("walletDivision5",     row.GetText(11), divs.wal5, notif, dbQ);
+	ProcessStringChange("walletDivision6",     row.GetText(12), divs.wal6, notif, dbQ);
+	ProcessStringChange("walletDivision7",     row.GetText(13), divs.wal7, notif, dbQ);
 
     std::string query = " UPDATE corporation SET ";
 
-    int N = dbQ.size();
-    for (int i = 0; i < N; i++) {
-        query = dbQ[i];
-        if (i < N - 1) query += ", ";
-    }
+	for( int i = 0; i < dbQ.size(); i ++ )
+	{
+		query += dbQ[i];
+		if( i < dbQ.size() - 1 ) query += ", ";
+	}
 
     query += " WHERE corporationID = %u";
 
-    if ((N > 0) && (!sDatabase.RunQuery(res.error, query.c_str(), corpID))) {
-        codelog(SERVICE__ERROR, "Error in query: %s", res.error.c_str());
-        return false;
-    }
+	if( ( dbQ.size() > 0  ) && ( !sDatabase.RunQuery( res.error, query.c_str(), corpID ) ) )
+	{
+		codelog( SERVICE__ERROR, "Error in query: %s", res.error.c_str() );
+		return false;
+	}
 
     return true;
 }
@@ -1330,9 +1492,314 @@ bool CorporationDB::ChangeCloneType(uint32 characterID, uint32 typeID) {
 }
 
 
+PyObjectEx* CorporationDB::GetBulletins( uint32 corporationID )
+{
+	DBQueryResult res;
 
+	if( !sDatabase.RunQuery( res,
+		"SELECT "
+		" bulletinID,"
+		" title,"
+		" body,"
+		" editCharacterID,"
+		" editDateTime"
+		" FROM crpbulletins"
+		" WHERE corporationID = %u", corporationID ) )
+	{
+		_log(DATABASE__ERROR, "Failed to get the corporation bulletins for corporation %u. Error: %s", corporationID, res.error.c_str() );
+		return NULL;
+	}
 
+	return DBResultToCRowset( res );
+}
 
+bool CorporationDB::SetCorporationHQ( uint32 corporationID, uint32 stationID )
+{
+	DBerror err;
 
+	if( !sDatabase.RunQuery( err,
+		"UPDATE corporation"
+		" SET stationID = %u"
+		" WHERE corporationID = %u", stationID, corporationID ))
+	{
+		_log(DATABASE__ERROR, "Failed to update the HQ for corporation %u. Error: %s", corporationID, err.c_str() );
+		return false;
+	}
 
+	if( !sDatabase.RunQuery( err,
+		"UPDATE entity"
+		" SET locationID = %u"
+		" WHERE itemID = %u", stationID, corporationID ))
+	{
+		_log(DATABASE__ERROR, "Failed to update the info in entity table. This can lead into game errors. Error: %s", err.c_str() );
+		return false;
+	}
 
+	return true;
+}
+
+int CorporationDB::GetCorporationHQ( uint32 corporationID )
+{
+	DBQueryResult res;
+	DBResultRow row;
+
+	if( !sDatabase.RunQuery( res,
+		"SELECT stationID"
+		" FROM corporation"
+		" WHERE corporationID = %u", corporationID ) )
+	{
+		_log( DATABASE__ERROR, "Failed to get the HQ for corporation %u. Error: %s", corporationID, res.error.c_str() );
+		return 0;
+	}
+
+	if( !res.GetRow( row ) )
+	{
+		_log(DATABASE__ERROR, "Can't fetch row" );
+		return 0;
+	}
+
+	return row.GetUInt( 0 );
+
+}
+
+// The titles are modified by the corp ceo, so its dynamic data...
+// Also the corpRoles and corpRoleGroups can be modified by the corp ceo...
+// We should also add this later, but its basically the same...
+PyRep* CorporationDB::GetTitles( uint32 corpID )
+{
+	DBQueryResult res;
+
+	if( !sDatabase.RunQuery( res,
+		"SELECT titleID,"
+		" titleName,"
+		" grantableRoles,"
+		" grantableRolesAtHQ,"
+		" grantableRolesAtBase,"
+		" grantableRolesAtOther"
+		" FROM crptitles"
+		" WHERE corporationID = %u", corpID ) )
+	{
+		_log(DATABASE__ERROR, "Can't fetch titles for corporation. Error: %s", res.error.c_str() );
+		return NULL;
+	}
+
+	return DBResultToIndexRowset( res, "titleID" );
+}
+
+/*
+              itr:"characterID"
+              itr:"corporationID"
+              itr:"divisionID"
+              itr:"squadronID"
+              itr:"title"
+              itr:"roles"
+              itr:"grantableRoles"
+              itr:"startDateTime"
+              itr:"baseID"
+              itr:"rolesAtHQ"
+              itr:"grantableRolesAtHQ"
+              itr:"rolesAtBase"
+              itr:"grantableRolesAtBase"
+              itr:"rolesAtOther"
+              itr:"grantableRolesAtOther"
+              itr:"titleMask"
+              itr:"accountKey"
+              itr:"rowDate"
+              itr:"blockRoles"
+*/
+
+uint32 CorporationDB::GetMembers( uint32 corpID )
+{
+	DBQueryResult res;
+	DBResultRow row;
+
+	if( !sDatabase.RunQuery( res,
+		"SELECT"
+		" COUNT(characterID) AS characterCount"
+		" FROM character_"
+		" WHERE corporationID = %u", corpID ) )
+	{
+		_log(DATABASE__ERROR, "Error in query: %s", res.error.c_str() );
+		return 0;
+	}
+
+	if( res.GetRow( row ) )
+	{
+		return row.GetUInt( 0 );
+	}
+	else
+	{
+		_log(DATABASE__ERROR, "Can't get the number of members..." );
+	}
+
+	return 0;
+}
+
+PyRep* CorporationDB::FetchMembers( uint32 corpID, uint32 from, uint32 count )
+{
+	DBQueryResult res;
+	DBResultRow row;
+
+	if( !sDatabase.RunQuery( res,
+		"SELECT characterID,"
+		" character_.corporationID,"
+		" corpAccountKey - 1000 AS divisionID,"
+		" squadronID,"
+		" title,"
+		" corpRole AS roles,"
+		" crpTitles.grantableRoles,"
+		" startDateTime,"
+		" characterID AS baseID,"
+		" rolesAtHQ,"
+		" crpTitles.grantableRolesAtHQ,"
+		" rolesAtBase,"
+		" crpTitles.grantableRolesAtBase,"
+		" rolesAtOther,"
+		" crpTitles.grantableRolesAtOther,"
+		" titleMask,"
+		" corpAccountKey AS accountKey,"
+		" corporationDateTime AS rowDate,"
+		" 0 AS blockRoles"
+		" FROM character_"
+		" LEFT JOIN crpTitles ON crpTitles.titleID & titleMask"
+		" WHERE crpTitles.corporationID = %u"
+		" AND character_.corporationID = %u"
+		" LIMIT %u, %u", corpID, corpID, from, count ) )
+	{
+		_log(DATABASE__ERROR, "Error in query: %s", res.error.c_str() );
+		return NULL;
+	}
+	/*
+	PyList* result = new PyList();
+
+	while( res.GetRow( row ) )
+	{
+		// Create the object
+		Reply_FetchMember tmp;
+		tmp.params = new PyList();
+
+		// Add the memberID that should be the characterID
+		tmp.memberID = row.GetUInt( 0 );
+
+		// Add data
+		tmp.params->AddItemInt( row.GetUInt( 0 ) );
+		tmp.params->AddItemInt( row.GetUInt( 1 ) );
+		tmp.params->AddItemInt( row.GetUInt( 2 ) );
+		tmp.params->AddItemString( row.GetText( 3 ) );
+		tmp.params->AddItemLong( row.GetUInt64( 4 ) );
+		tmp.params->AddItemLong( row.GetUInt64( 5 ) );
+		tmp.params->AddItemLong( row.GetUInt64( 6 ) );
+		tmp.params->AddItemInt( row.GetUInt( 7 ) );
+		tmp.params->AddItemLong( row.GetUInt64( 8 ) );
+		tmp.params->AddItemLong( row.GetUInt64( 9 ) );
+		tmp.params->AddItemLong( row.GetUInt64( 10 ) );
+		tmp.params->AddItemLong( row.GetUInt64( 11 ) );
+		tmp.params->AddItemLong( row.GetUInt64( 12 ) );
+		tmp.params->AddItemLong( row.GetUInt64( 13 ) );
+		tmp.params->AddItemInt( row.GetUInt( 14 ) );
+		tmp.params->AddItemInt( row.GetUInt( 15 ) );
+		tmp.params->AddItemLong( row.GetUInt( 16 ) );
+		tmp.params->AddItemLong( row.GetUInt64( 17 ) );
+
+		result->AddItem( tmp.Encode() );
+	}
+	*/
+	return DBResultToRowset( res );
+}
+
+PyRep* CorporationDB::GetRoles( uint32 corpID )
+{
+	DBQueryResult res;
+
+	if( !sDatabase.RunQuery( res,
+		"SELECT roleID,"
+		" roleID AS roleIID,"
+		" roleMask,"
+		" roleName,"
+		" shortDescription,"
+		" description"
+		" FROM crproles"
+		" WHERE corporationID = %u", corpID ) )
+	{
+		_log( DATABASE__ERROR, "Error in query: %s", res.error.c_str() );
+		return NULL;
+	}
+
+	return DBResultToCRowset( res );
+}
+
+PyRep* CorporationDB::GetRoleGroups( uint32 corpID )
+{
+	DBQueryResult res;
+
+	if( !sDatabase.RunQuery( res,
+		"SELECT roleGroupID,"
+		" roleGroupName,"
+		" isDivisional,"
+		" roleMask"
+		" FROM crprolegroups"
+		" WHERE corporationID = %u", corpID ) )
+	{
+		_log( DATABASE__ERROR, "Error in query: %s", res.error.c_str() );
+		return NULL;
+	}
+
+	return DBResultToRowset( res );
+}
+
+PyRep* CorporationDB::GetRecruitmentAdsByCriteria( uint32 regionID, double skillPoints, uint32 typeMask, uint32 raceMask, uint32 isInAlliance, uint32 minMembers, uint32 maxMembers )
+{
+	DBQueryResult res;
+
+	// Create the query string
+	// Its a bit stupid, but will work correctly
+	std::string query = "SELECT "
+						" rec.adID,"
+						" rec.corporationID,"
+						" rec.allianceID,"
+						" rec.expiryDateTime,"
+						" rec.stationID,"
+						" rec.regionID,"
+						" rec.raceMask,"
+						" rec.typeMask,"
+						" rec.description,"
+						" rec.createDateTime,"
+						" rec.skillPoints,"
+						" rec.channelID"
+						" FROM crpRecruitmentAds AS rec"
+						" LEFT JOIN corporation ON corporation.corporationID = rec.corporationID"
+						" WHERE regionID = %u";
+	
+	if( skillPoints > 0 )
+	{
+		query += " AND rec.skillpoints <= ";
+		query += itoa( (uint32)skillPoints );
+	}
+
+	query += " AND rec.typeMask = %u"
+			 " AND rec.raceMask = %u";
+	
+	if( isInAlliance == 1 )
+	{
+		query += " AND rec.allianceID > 0";
+	}
+
+	
+	query += " AND corporation.memberCount >= %u"
+			 " AND corporation.memberCount <= %u";
+
+	if( !sDatabase.RunQuery( res,
+		query.c_str(),
+		regionID,
+		typeMask,
+		raceMask,
+		minMembers,
+		maxMembers
+	))
+	{
+		_log(DATABASE__ERROR, "Can't fetch RecruitmentAds by Criteria");
+		return NULL;
+	}
+
+	return DBResultToRowset( res );
+}

@@ -73,6 +73,8 @@ CharMgrService::CharMgrService(PyServiceMgr *mgr)
 	PyCallable_REG_CALL(CharMgrService, GetCloneTypeID)
 	PyCallable_REG_CALL(CharMgrService, GetHomeStation)
 	PyCallable_REG_CALL(CharMgrService, GetFactions)
+	PyCallable_REG_CALL(CharMgrService, AddContact)
+	PyCallable_REG_CALL(CharMgrService, GetLabels)
 }
 
 CharMgrService::~CharMgrService() {
@@ -197,6 +199,35 @@ PyResult CharMgrService::Handle_GetFactions( PyCallArgs& call )
 	return NULL;
 }
 
+PyResult CharMgrService::Handle_AddContact( PyCallArgs& call )
+{
+	sLog.Debug( "CharMgrService", "Called AddContact stub." );
+
+	Call_AddContact args;
+
+	if( !args.Decode( &call.tuple ) )
+	{
+		codelog( SERVICE__ERROR, "Wrong parameters to AddContact" );
+		return NULL;
+	}
+
+	return NULL;
+}
+
+PyResult CharMgrService::Handle_GetLabels( PyCallArgs& call )
+{
+	sLog.Debug( "CharMgrService", "Called GetLabels stub." );
+
+	// Just send a dummy for now
+	DBRowDescriptor *header = new DBRowDescriptor();
+
+	header->AddColumn("noteID", DBTYPE_I4);
+	header->AddColumn("label", DBTYPE_WSTR);
+
+	CRowSet *rowset = new CRowSet( &header );
+
+	return rowset;
+}
 
 PyResult CharacterBound::Handle_ListStations( PyCallArgs& call )
 {
@@ -233,4 +264,3 @@ PyResult CharacterBound::Handle_List( PyCallArgs& call )
 	ItemDB m_db;
 	return m_db.ListItems( call.client->GetCharacterID() );
 }
-

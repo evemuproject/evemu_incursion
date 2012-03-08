@@ -55,6 +55,8 @@ public:
 		PyCallable_REG_CALL(CorpStationMgrIMBound, GetNumberOfUnrentedOffices)
 		//testing
 		PyCallable_REG_CALL(CorpStationMgrIMBound, GetCorporateStationOffice)
+		PyCallable_REG_CALL(CorpStationMgrIMBound, DoesPlayersCorpHaveJunkAtStation)
+		PyCallable_REG_CALL(CorpStationMgrIMBound, MoveCorpHQHere)
 	}
 	virtual ~CorpStationMgrIMBound() { delete m_dispatch; }
 	virtual void Release() {
@@ -74,6 +76,8 @@ public:
 	PyCallable_DECL_CALL(GetNumberOfUnrentedOffices)
 	//testing
 	PyCallable_DECL_CALL(GetCorporateStationOffice)
+	PyCallable_DECL_CALL(DoesPlayersCorpHaveJunkAtStation)
+	PyCallable_DECL_CALL(MoveCorpHQHere)
 
 protected:
     Dispatcher *const m_dispatch;
@@ -265,17 +269,29 @@ PyResult CorpStationMgrIMBound::Handle_RentOffice(PyCallArgs &call) {
 	uint32 location = call.client->GetLocationID();
 
 	// check if the corp has enough money
-	double corpBalance = m_db.GetCorpBalance(call.client->GetCorporationID());
+	double corpBalance = m_db.GetCorpBalance(call.client->GetCorporationID(), accountCash);
 	if (corpBalance < arg.arg) {
 		_log(SERVICE__ERROR, "%s: Corp doesn't have enough money to rent an office.", call.client->GetName());
 		return (new PyInt(0));
 	}
 
+	// This will create the office folder if it doesn't exists yet
+	StationRef station = m_manager->item_factory.GetStation( call.client->GetStationID() );
+	OfficeFolderRef officeFolder = station->GetOfficeFolder();
 
-	// We should also check if the station has a free office atm...
+	if( officeFolder->GetOfficeSlotsLeft() == 0)
+	{
+		throw new PyException( MakeCustomError( "There isn't enough space for a new Office" ) );
+	}
+
+	OfficeRef office = officeFolder->InstallOffice( call.client->GetCorporationID() );
+	
 	OfficeInfo oInfo(call.client->GetCorporationID(), call.client->GetStationID());
-	oInfo.officeID = m_db.ReserveOffice(oInfo);
+	oInfo.officeID = office->itemID();
+	oInfo.officeFolderID = officeFolder->itemID();
+
 	// should we also put this into the entity table?
+	// Yep, the office folder are basically containers for offices
 
 
 	if (!oInfo.officeID) {
@@ -310,7 +326,7 @@ PyResult CorpStationMgrIMBound::Handle_RentOffice(PyCallArgs &call) {
 
 
 	// remove the money
-	m_db.AddBalanceToCorp(oInfo.corporationID, -double(arg.arg));
+	m_db.AddBalanceToCorp(oInfo.corporationID, -double(arg.arg), accountCash);
 	corpBalance -= arg.arg;	// This is the new corp money. Do I have to make a casting here?
 	// record the transaction
 	m_db.GiveCash(oInfo.corporationID, RefType_officeRentalFee, oInfo.corporationID, oInfo.stationID, "unknown", call.client->GetAccountID(), accountCash, -double(arg.arg), corpBalance, "Renting office for 30 days"); 
@@ -346,7 +362,7 @@ PyResult CorpStationMgrIMBound::Handle_RentOffice(PyCallArgs &call) {
     Noic_row.line->AddItemInt( oInfo.officeID );
     Noic_row.line->AddItemInt( 27 );
     Noic_row.line->AddItemInt( ac.ownerid );
-    Noic_row.line->AddItemInt( oInfo.officeFolderID );
+    Noic_row.line->AddItemInt( oInfo.stationID );
     Noic_row.line->AddItemInt( flagOfficeSlotFirst );
     Noic_row.line->AddItemInt( 0 );
     Noic_row.line->AddItemInt( 1 );
@@ -616,14 +632,55 @@ PyResult CorpStationMgrIMBound::Handle_GetCorporateStationOffice(PyCallArgs &cal
 	return NULL;
 }
 
+PyResult CorpStationMgrIMBound::Handle_DoesPlayersCorpHaveJunkAtStation( PyCallArgs& call )
+{
+	sLog.Debug( "CorpStationMgrIMBound", "Called DoesPlayersCorpHaveJunkAtStation stub." );
 
+	return new PyBool( true );
+}
 
+PyResult CorpStationMgrIMBound::Handle_MoveCorpHQHere( PyCallArgs& call )
+{
+	// Takes no arguments
+	sLog.Debug( "CorpStationMgrIMBound", "Called MoveCorpHQHere stub." );
 
+	uint32 corpID = call.client->GetCorporationID();
+	uint32 stationID = call.client->GetStationID();
 
+	m_db.SetCorporationHQ( corpID, stationID );
 
+	Notify_OnCorporaionChanged cc;
 
+	cc.corpID = corpID;
+		
+	if( !m_db.CreateCorporationChangePacket( cc, corpID, corpID ) )
+	{
+		codelog(SERVICE__ERROR, "Failed to create OnCorpChanged notification stream." );
 
+		call.client->SendErrorMsg( "Unable to notify about corp changes. Try logging in again" );
 
+		return new PyInt( 0 );
+	}
 
+	PyTuple* a1 = cc.Encode();
+	PyTuple* a2 = cc.Encode();
+		
+	m_manager->entity_list.Multicast("OnCorporationChanged", "clientID", &a1, NOTIF_DEST__CORPORATION, corpID);
+	m_manager->entity_list.Multicast("OnCorporationChanged", "stationid", &a2, NOTIF_DEST__CORPORATION, corpID);
 
+	std::vector<Client *> clients;
 
+	m_manager->entity_list.FindByCorporationID( corpID, clients );
+
+	std::vector<Client *>::const_iterator cur, end;
+
+	cur = clients.begin();
+	end = clients.end();
+
+	for( ; cur != end; cur++ )
+	{
+		(*cur)->UpdateSession( "hqID", stationID ); // Update the sessions
+	}
+
+	return NULL;
+}

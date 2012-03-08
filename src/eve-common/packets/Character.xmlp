@@ -206,6 +206,17 @@
       <int name="stationID" />
     </tupleInline>
   </elementDef>
+
+  <elementDef name="Call_AddContact">
+    <tupleInline>
+      <int name="characterID" />
+      <int name="standing" />
+      <int name="addToWatchList" />
+      <int name="notify" />
+      <string name="message" />
+    </tupleInline>
+  </elementDef>
+  
   <!-- This doesnt belongs to Character packets -->
   <elementDef name="Call_InsureShip">
     <tupleInline>

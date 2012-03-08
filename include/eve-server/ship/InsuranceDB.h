@@ -36,7 +36,8 @@ public:
 	bool GetStationItems( std::vector<int32> &into, uint32 stationID, uint32 characterID );
 	PyRep* GetContracts( const std::vector<int32> &ships, uint32 characterID );
 	bool InsureShip( uint32 shipID, uint32 ownerID, double fraction );
-	bool UnInsureShip( uint32 shipID, uint32 characterID );
+	bool IsShipInsured( uint32 shipID );
+	bool UnInsureShip( uint32 shipID );
 };
 
 

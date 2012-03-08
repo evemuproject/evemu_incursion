@@ -118,28 +118,67 @@ bool AccountDB::CheckIfCorporation(uint32 corpID) {
 	return true;
 }
 
-bool ServiceDB::AddBalanceToCorp(uint32 corpID, double amount) {
+bool ServiceDB::AddBalanceToCorp(uint32 corpID, double amount, uint32 corpAccountKey)
+{
 	DBerror err;
-	if (!sDatabase.RunQuery(err, "UPDATE corporation SET balance = balance + (%lf) WHERE corporationID = %u ", amount, corpID))
+	std::string name;
+
+	if( ( corpAccountKey < 1000 ) || ( corpAccountKey > 1006 ) )
 	{
-        sLog.Error("Service DB", "Error in query: %s", err.c_str());
+		corpAccountKey = 1000;
+	}
+
+	// Care about wallet keys!
+	if( corpAccountKey == 1000 )
+		sprintf( name, "balance" );
+	else
+		sprintf( name, "divisionBalance%u", corpAccountKey - 999 );
+
+	if( !sDatabase.RunQuery( err,
+		"UPDATE corporation"
+		" SET %s = %s + (%lf)"
+		" WHERE corporationID = %u", name.c_str(), name.c_str(), amount, corpID ) )
+	{
+		sLog.Error( "Service DB", "Error in query: %s", err.c_str() );
 		return false;
 	}
+
 	return true;
 }
 
-double ServiceDB::GetCorpBalance(uint32 corpID) {
+double ServiceDB::GetCorpBalance(uint32 corpID, uint32 corpAccountKey)
+{
+
 	DBQueryResult res;
 	DBResultRow row;
-	if (!sDatabase.RunQuery(res, "SELECT balance FROM corporation WHERE corporationID = %u ", corpID))
+	std::string name;
+
+	if( ( corpAccountKey < 1000 ) || ( corpAccountKey > 1006 ) )
 	{
-        sLog.Error("Service DB", "Error in query: %s", res.error.c_str());
+		corpAccountKey = 1000;
+	}
+
+	// Care about wallet keys!
+	if( corpAccountKey == 1000 )
+		sprintf( name, "balance" );
+	else
+		sprintf( name, "divisionBalance%u", corpAccountKey - 999 );
+
+	if( !sDatabase.RunQuery( res,
+		"SELECT "
+		" %s"
+		" FROM corporation"
+		" WHERE corporationID = %u", name.c_str(), corpID ) )
+	{
+		sLog.Error( "Service DB", "Error in query: %s", res.error.c_str() );
 		return 0.0;
 	}
-	if (!res.GetRow(row))
-    {
-        sLog.Error("Service DB", "Corporation %u missing from database.", corpID);
+
+	if( !res.GetRow( row ) )
+	{
+		sLog.Error( "Service DB", "Corporation %u missing from database", corpID );
 		return 0.0;
 	}
-	return row.GetDouble(0);
+
+	return row.GetDouble( 0 );
 }

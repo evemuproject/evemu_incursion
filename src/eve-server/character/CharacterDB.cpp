@@ -246,7 +246,8 @@ void CharacterDB::GetCharacterData(uint32 characterID, std::map<std::string, uin
         "  character_.rolesAtBase, "
         "  character_.rolesAtHQ, "
         "  character_.rolesAtOther, "
-        "  entity.locationID "
+        "  entity.locationID, "
+		"  character_.corpAccountKey "
         " FROM character_ "
         "  LEFT JOIN corporation USING (corporationID) "
         "  LEFT JOIN entity ON entity.itemID = character_.characterID "
@@ -277,6 +278,7 @@ void CharacterDB::GetCharacterData(uint32 characterID, std::map<std::string, uin
     characterDataMap["rolesAtHQ"] = row.GetUInt(9);
     characterDataMap["rolesAtOther"] = row.GetUInt(10);
     characterDataMap["locationID"] = row.GetUInt(11);
+	characterDataMap["corpAccountKey"] = row.GetUInt(12);
 }
 
 PyObject *CharacterDB::GetCharPublicInfo3(uint32 characterID) {
@@ -829,3 +831,18 @@ bool CharacterDB::del_name_validation_set( uint32 characterID )
 		return false;
 	}
 }
+
+
+bool ServiceDB::SetCorpAccountKey( uint32 characterID, uint32 corpAccountKey )
+{
+	DBerror err;
+
+	if( !sDatabase.RunQuery( err, "UPDATE character_ SET corpAccountKey = %u WHERE characterID = %u", corpAccountKey, characterID ) )
+	{
+		codelog( DATABASE__ERROR, "Error updating corpAccountKey for character %u. Error: %s", characterID, err.c_str() );
+		return false;
+	}
+
+	return true;
+}
+

@@ -34,6 +34,7 @@ CorpMgrService::CorpMgrService(PyServiceMgr *mgr)
 	_SetCallDispatcher(m_dispatch);
 
 	PyCallable_REG_CALL(CorpMgrService, GetPublicInfo)
+	PyCallable_REG_CALL(CorpMgrService, GetAssetInventory)
 }
 
 CorpMgrService::~CorpMgrService() {
@@ -51,22 +52,47 @@ PyResult CorpMgrService::Handle_GetPublicInfo(PyCallArgs &call) {
 	return m_db.GetCorporation(corpID.arg);
 }
 
+PyResult CorpMgrService::Handle_GetAssetInventory( PyCallArgs& call )
+{
+	/*
+		Packet structure
 
+		[PyTuple 2 Items]
+			[PyInt 1000179] <- Corporation ID
+			[PyString 'offices'] <- This can be multiple values:
+									offices, junk, property, deliveries
+	*/
+	sLog.Debug( "CorpMgrService", "Called GetAssetInventory stub." );
+	
+	// Manual decode to do test for now...
+	if( call.tuple->size() != 2 )
+	{
+		sLog.Error( "CorpMgrService", "Wrong size for GetAssetInventory" );
+		return NULL;
+	}
 
+	if( !call.tuple->GetItem( 0 )->IsInt() )
+	{
+		sLog.Error( "CorpMgrService", "Wrong type for arg1" );
+		return NULL;
+	}
 
+	if( !call.tuple->GetItem( 1 )->IsString() )
+	{
+		sLog.Error( "CorpMgrService", "Wrong type for arg2" );
+		return NULL;
+	}
 
+	// Send an empty list
+	PyList* res = new PyList();
 
+	util_Row row;
+	row.line = new PyList();
 
+	row.header.push_back( "locationID" );
+	row.line->AddItemInt( call.client->GetCorpHQ() );
 
+	res->AddItem( row.Encode() );
 
-
-
-
-
-
-
-
-
-
-
-
+	return res;
+}

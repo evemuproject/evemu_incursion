@@ -36,10 +36,12 @@ class Certificate;
 class Owner;
 class Structure;
 class CargoContainer;
+class OfficeFolder;
 
 class Character;
 class SolarSystem;
 class Station;
+class Office;
 
 /*
  * Typedefs for all item classes we have:
@@ -63,6 +65,8 @@ typedef RefPtr<Structure>                StructureRef;
 typedef RefPtr<const Structure>          StructureConstRef;
 typedef RefPtr<CargoContainer>           CargoContainerRef;
 typedef RefPtr<const CargoContainer>     CargoContainerConstRef;
+typedef RefPtr<OfficeFolder>			 OfficeFolderRef;
+typedef RefPtr<const OfficeFolder>		 OfficeFolderConstRef;
 
 typedef RefPtr<Character>                CharacterRef;
 typedef RefPtr<const Character>          CharacterConstRef;
@@ -70,6 +74,8 @@ typedef RefPtr<SolarSystem>              SolarSystemRef;
 typedef RefPtr<const SolarSystem>        SolarSystemConstRef;
 typedef RefPtr<Station>                  StationRef;
 typedef RefPtr<const Station>            StationConstRef;
+typedef RefPtr<Office>					 OfficeRef;
+typedef RefPtr<const Office>			 OfficeConstRef;
 
 #endif /* !__ITEM_REF__H__INCL__ */
 

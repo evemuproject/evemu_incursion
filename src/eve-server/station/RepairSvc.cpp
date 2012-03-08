@@ -251,7 +251,7 @@ PyResult RepairService::Handle_UnasembleItems( PyCallArgs& call )
 		}
 
 		ship->ChangeSingleton( false );
-		m_db.UnInsureShip( ship->itemID(), call.client->GetCharacterID() );
+		m_db.UnInsureShip( ship->itemID() );
 
 	}
 
