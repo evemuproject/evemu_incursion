@@ -39,6 +39,7 @@ public:
 	GenericModule()
     {
         m_Module_State = MOD_UNFITTED;
+        m_Charge_State = MOD_UNLOADED;
     }
 	virtual ~GenericModule() 
 	{
@@ -121,6 +122,7 @@ protected:
 	ModuleEffects * m_Effects;
 
     ModuleStates m_Module_State;
+    ChargeStates m_Charge_State;
 
 };
 

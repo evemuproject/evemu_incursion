@@ -51,7 +51,11 @@ enum ModuleStates
     MOD_ONLINE,
     MOD_ACTIVATED,
     MOD_DEACTIVATING,
-    MOD_OVERLOADED,
+    MOD_OVERLOADED
+};
+
+enum ChargeStates
+{
     MOD_UNLOADED,
     MOD_LOADED,
     MOD_LOADING,
@@ -62,10 +66,9 @@ enum ModuleStates
 enum ModuleEffectTriggers
 {
     EFFECT_ONLINE,              // means the effect takes effect on the target (see below) upon entering the ONLINE state
-    EFFECT_ACTIVE_MAINTAIN,     // used only for ACTIVE modules with NO duration attribute; means the effect takes effect on the
-                                // target (see below) upon entering the ACTIVATE state, then reversed when going out of ACTIVATE state
-    EFFECT_ACTIVE_CONSUME       // used only for modules with A duration attribute; means the effect takes effect on the
-};                              // target (see below) one extra time when in ACTIVATE state after each CYCLE duration expires
+    EFFECT_ACTIVE,              // used only for ACTIVE modules operating in non-Overloaded mode
+    EFFECT_OVERLOAD             // used only for ACTIVE modules operating in Overloaded mode
+};
 
 // These are the targets to which module effects are applied when activated:
 enum ModuleEffectTargets
@@ -74,6 +77,14 @@ enum ModuleEffectTargets
     SHIP,           // means the target of the effect is the attribute(s) of the ship to which the module is fitted
     TARGET          // means the target of the effect is the attribute(s) of the current target of the ship to which the module is fitted
 };
+
+// These are the methods by which module effects are applied to the designated target:
+enum ModuleApplicationTypes
+{
+    EFFECT_ACTIVE_MAINTAIN,     // applied by ACTIVE modules where an effect is maintained; means the effect takes effect on the
+                                // target (see below) upon entering the ACTIVATE state, then reversed when going out of ACTIVATE state
+    EFFECT_ACTIVE_CONSUME       // applied by ACTIVE modules where an effect is applied cumulatively on each cycle; means the effect takes
+};                              // effect on the target (see below) one extra time when in ACTIVATE state after each CYCLE duration expires
 
 //this may or may not be redundant...idk
 enum ModulePowerLevel

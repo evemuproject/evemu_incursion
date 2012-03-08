@@ -106,6 +106,7 @@ void MEffect::Populate(uint32 effectID)
 	m_ReverseCalculationTypeID = new int[res->GetRowCount()];
     m_EffectAppliedWhenIDs = new int[res->GetRowCount()];
     m_EffectAppliedTargetIDs = new int[res->GetRowCount()];
+    m_EffectApplicationTypeIDs = new int[res->GetRowCount()];
 
 	//counter
 	int count = 0;
@@ -118,6 +119,7 @@ void MEffect::Populate(uint32 effectID)
 		m_ReverseCalculationTypeID[count] = row2.GetInt(3);
         m_EffectAppliedWhenIDs[count] = row2.GetInt(4);
         m_EffectAppliedTargetIDs[count] = row2.GetInt(5);
+        m_EffectApplicationTypeIDs[count] = row2.GetInt(6);
 		count++;
 	}
 
