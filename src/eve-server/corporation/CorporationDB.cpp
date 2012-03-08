@@ -1315,9 +1315,15 @@ bool CorporationDB::ChangeCloneType(uint32 characterID, uint32 typeID) {
 }
 
 
-
-
-
-
-
-
+PyRep *CorporationDB::GetMyShares(uint32 charID) {
+    DBQueryResult res;
+    if (!sDatabase.RunQuery(res,
+        " SELECT corporationID, shares "
+        " FROM crpcharshares "
+        " WHERE characterID = %u ", charID))
+    {
+        codelog(SERVICE__ERROR, "Error in query: %s", res.error.c_str());
+        return NULL;
+    }
+    return DBResultToRowset(res);
+}
