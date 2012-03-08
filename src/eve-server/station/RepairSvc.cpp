@@ -153,7 +153,7 @@ PyResult RepairBound::Handle_GetDamageReports( PyCallArgs& call )
 				maxHealth += ship->GetAttribute( AttrHp ).get_int();
 
 			lines->AddItemInt( maxHealth );
-			lines->AddItemInt( 1 ); // The ship is repairable
+			lines->AddItemInt( 1 ); // The ship is repairable, HACK
 
 			costToRepairOneUnitOfDamage = ship->typeID(); // Hack while i try to guess the formula
 
@@ -176,7 +176,7 @@ PyResult RepairBound::Handle_GetDamageReports( PyCallArgs& call )
 				if( modules.at( i )->HasAttribute( AttrHp ) )
 					lines->AddItemInt( modules.at( i )->GetAttribute( AttrHp ).get_int() );
 
-				lines->AddItemInt( 1 );
+				lines->AddItemInt( 1 ); // Repairable item. HACK
 
 				lines->AddItemInt( modules.at( i )->typeID() ); // Hack while i try to guess the formula
 
@@ -200,7 +200,7 @@ PyResult RepairBound::Handle_GetDamageReports( PyCallArgs& call )
 			if( item->HasAttribute( AttrHp ) )
 				lines->AddItemInt( item->GetAttribute( AttrHp ).get_int() );
 
-			lines->AddItemInt( 1 );
+			lines->AddItemInt( 1 ); // Repairable item. HACK
 			
 			lines->AddItemInt( item->typeID() ); // Hack while i try to guess the formula
 
@@ -208,7 +208,7 @@ PyResult RepairBound::Handle_GetDamageReports( PyCallArgs& call )
 		}
 
 		// Big hacks here, anyway them doesnt hurt anyone :P
-		res.line->AddItemReal( 0.0 );
+		res.line->AddItemReal( 0.0 ); // We should be able to get this from elsewhere
 		res.line->AddItemString( "0%" );
 		res.line->AddItemString( "100.0%" );
 		res.line->AddItem( quotes.Encode() );
@@ -269,17 +269,16 @@ PyResult RepairBound::Handle_DamageModules( PyCallArgs& call )
 		return new PyNone;
 	}
 
-	/*
-	 * Apply the damage points sent by the client
-	 */
+	// Apply the damage percentage 
+	// The client directly sends the percentage
 
 	uint32 itemID = 0;
 	uint32 damage = 0;
 
 	for( size_t i = 0; i < args.data->size(); i ++ )
 	{
-		itemID = args.data->GetItem( 0 )->AsTuple()->GetItem( 0 )->AsInt()->value();
-		damage = args.data->GetItem( 0 )->AsTuple()->GetItem( 1 )->AsInt()->value();	
+		itemID = args.data->GetItem( i )->AsTuple()->GetItem( 0 )->AsInt()->value();
+		damage = args.data->GetItem( i )->AsTuple()->GetItem( 1 )->AsInt()->value();	
 
 		InventoryItemRef item = m_manager->item_factory.GetItem( itemID );
 
@@ -310,9 +309,10 @@ PyResult RepairBound::Handle_RepairItems( PyCallArgs& call )
 	double total = 0.0;
 	double total_paid = 0.0;
 
+	// This will repair the items we can afford
 	for( size_t i = 0; i < args.itemID->size(); i ++ )
 	{
-		InventoryItemRef item = m_manager->item_factory.GetItem( args.itemID->GetItem( 0 )->AsInt()->value() );
+		InventoryItemRef item = m_manager->item_factory.GetItem( args.itemID->GetItem( i )->AsInt()->value() );
 		total = item->typeID() * item->GetAttribute( AttrDamage ).get_int();
 
 		if( cost >= total )

@@ -354,7 +354,7 @@ bool CorporationDB::AddCorporation(Call_AddCorporation & corpInfo, uint32 charID
         "   taxRate, minimumJoinStanding, corporationType, hasPlayerPersonnelManager, sendCharTerminationMessage, "
         "   creatorID, ceoID, stationID, raceID, allianceID, shares, memberCount, memberLimit, "
         "   allowedMemberRaceIDs, graphicID, color1, color2, color3, shape1, shape2, shape3, "
-        "   typeface, isRecruiting "
+        "   typeface, isRecruiting"
         "   ) "
         " SELECT "
         "       %u, '%s', '%s', '%s', '%s', "

@@ -176,6 +176,7 @@ PyResult InsuranceBound::Handle_InsureShip( PyCallArgs& call )
 	uint32 percentage = args.cost * 100 / baseprice; // Truncate decimals( if any )
 
 	// There should be a better way to calculate this
+	// Anyway this is safer for the insurance code
 	switch( percentage )
 	{
 		case 5:
@@ -271,6 +272,8 @@ PyResult InsuranceBound::Handle_GetInsurancePrice( PyCallArgs& call )
 		return NULL;
 	}
 
+	// You should just return the basePrice of the ship
+	// The game will calculate everything needed client side
 	return new PyFloat( m_manager->item_factory.GetShipType( arg.arg )->basePrice() );
 }
 
