@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `dgmEffectsInfo` (
   `reverseCalculationTypeID` int(11) NOT NULL,
   `effectAppliedInState` int(11) NOT NULL,
   `effectAppliedTo` int(11) NOT NULL,
+  `effectApplicationType` int(11) NOT NULL,
   PRIMARY KEY (`effectID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

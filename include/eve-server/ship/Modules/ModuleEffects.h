@@ -43,6 +43,7 @@ public:
 	int * m_ReverseCalculationTypeID;
     int * m_EffectAppliedWhenIDs;
     int * m_EffectAppliedTargetIDs;
+    int * m_EffectApplicationTypeIDs;
 	int m_numOfIDs;
 
 	int m_EffectID;
@@ -93,7 +94,7 @@ public:
 	//this class uses a system to set the "active effect" that you want to get information about
 	//returns false if the effect specified is not found
 	bool SetActiveEffect(uint32 effectID);
-	bool SetDefaultEffectAsActive();
+	//bool SetDefaultEffectAsActive();
 
 	//accessors for selected effect
 	uint32 GetEffectID()										{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_EffectID; }
@@ -139,13 +140,14 @@ private:
 
 	//data members
 	int m_TypeID;
-	int *m_EffectIDs;
-	MEffect * m_Effects;
-	uint32 m_DefaultEffect;
+	//int *m_EffectIDs;
+	//MEffect * m_Effects;
+
+    //uint32 m_DefaultEffect;
 
 	//internal counters
 	uint32 m_EffectCount;
-	uint32 m_SelectedEffect;
+	//uint32 m_SelectedEffect;
 
 	//cached stuff
 	bool m_HighPower, m_MediumPower, m_LowPower, m_Cached;
