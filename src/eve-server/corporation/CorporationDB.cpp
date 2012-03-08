@@ -343,14 +343,22 @@ bool CorporationDB::AddCorporation(Call_AddCorporation & corpInfo, uint32 charID
         "   taxRate, minimumJoinStanding, corporationType, hasPlayerPersonnelManager, sendCharTerminationMessage, "
         "   creatorID, ceoID, stationID, raceID, allianceID, shares, memberCount, memberLimit, "
         "   allowedMemberRaceIDs, graphicID, color1, color2, color3, shape1, shape2, shape3, "
-        "   typeface "
+<<<<<<< HEAD
+        "   typeface, isRecruiting "
+=======
+        "   typeface, isRecruiting, creatorID "
+>>>>>>> 20d496aa1b213346c2369cc60bf1048c00c941e4
         "   ) "
         " SELECT "
         "       '%s', '%s', '%s', '%s', "
         "       %lf, 0, 2, 0, 1, "
         "       %u, %u, %u, chrBloodlines.raceID, 0, 1000, 0, 10, "
         "       chrBloodlines.raceID, 0, %s, %s, %s, %s, %s, %s, "
-        "       NULL "
+<<<<<<< HEAD
+        "       NULL, %u "
+=======
+        "       NULL, %u, %u "
+>>>>>>> 20d496aa1b213346c2369cc60bf1048c00c941e4
         "    FROM entity "
         "       LEFT JOIN bloodlineTypes USING (typeID) "
         "       LEFT JOIN chrBloodlines USING (bloodlineID) "
@@ -364,6 +372,11 @@ bool CorporationDB::AddCorporation(Call_AddCorporation & corpInfo, uint32 charID
         _IoN(corpInfo.shape1).c_str(),
         _IoN(corpInfo.shape2).c_str(),
         _IoN(corpInfo.shape3).c_str(),
+		corpInfo.membershipEnabled,
+<<<<<<< HEAD
+=======
+		charID,
+>>>>>>> 20d496aa1b213346c2369cc60bf1048c00c941e4
         charID))
     {
         codelog(SERVICE__ERROR, "Error in query: %s", err.c_str());
@@ -701,7 +714,9 @@ PyObject *CorporationDB::GetCorporation(uint32 corpID) {
         "   allianceID,shares,memberCount,memberLimit,allowedMemberRaceIDs,"
         "   graphicID,shape1,shape2,shape3,color1,color2,color3,typeface,"
         "   division1,division2,division3,division4,division5,division6,"
-        "   division7,deleted"
+        "   division7,deleted,walletDivision2,walletDivision3,"
+		"	walletDivision4,walletDivision5,walletDivision6,walletDivision7,"
+		"	isRecruiting "
         " FROM corporation "
         " WHERE corporationID = %u", corpID))
     {

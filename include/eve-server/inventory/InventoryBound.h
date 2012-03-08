@@ -43,6 +43,7 @@ public:
     PyCallable_DECL_CALL(MultiAdd)
     PyCallable_DECL_CALL(GetItem)
     PyCallable_DECL_CALL(ListStations)
+	PyCallable_DECL_CALL(ListStationItems)
     PyCallable_DECL_CALL(ReplaceCharges)
     PyCallable_DECL_CALL(MultiMerge)
     PyCallable_DECL_CALL(StackAll)

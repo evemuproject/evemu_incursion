@@ -40,6 +40,7 @@ InventoryBound::InventoryBound( PyServiceMgr *mgr, Inventory &inventory, EVEItem
     PyCallable_REG_CALL(InventoryBound, MultiAdd)
     PyCallable_REG_CALL(InventoryBound, GetItem)
     PyCallable_REG_CALL(InventoryBound, ListStations)
+	PyCallable_REG_CALL(InventoryBound, ListStationItems)
     PyCallable_REG_CALL(InventoryBound, ReplaceCharges)
     PyCallable_REG_CALL(InventoryBound, MultiMerge)
     PyCallable_REG_CALL(InventoryBound, StackAll)
@@ -100,16 +101,29 @@ PyResult InventoryBound::Handle_ReplaceCharges(PyCallArgs &call) {
 }
 
 
+PyResult InventoryBound::Handle_ListStationItems( PyCallArgs& call )
+{
+	Call_SingleIntegerArg arg;
+
+	uint32 stationID = 0;
+	if( !arg.Decode( &call.tuple ) )
+	{
+		_log( SERVICE__ERROR, "Bad arguments to ListStationItems. Using client stationID" );
+		stationID = call.client->GetStationID();
+	}
+	else
+		stationID = arg.arg;
+
+	ItemDB m_db;
+	return m_db.ListStationItems( call.client->GetCharacterID(), stationID );
+}
+
 PyResult InventoryBound::Handle_ListStations( PyCallArgs& call )
 {
     sLog.Debug( "InventoryBound", "Called ListStations stub." );
 
-    util_Rowset rowset;
-
-    rowset.header.push_back( "stationID" );
-    rowset.header.push_back( "itemCount" );
-
-    return rowset.Encode();
+	ItemDB m_db;
+	return m_db.ListStations( call.client->GetCharacterID() );
 }
 
 PyResult InventoryBound::Handle_GetItem(PyCallArgs &call) {

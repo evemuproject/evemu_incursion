@@ -558,6 +558,13 @@
     </tupleInline>
   </elementDef>
 
+  <elementDef name="Call_RepairItems">
+    <tupleInline>
+      <list name="itemID" none_marker="0" />
+      <real name="cost" none_marker="0" />
+    </tupleInline>
+  </elementDef>
+
 </elements>
 
 

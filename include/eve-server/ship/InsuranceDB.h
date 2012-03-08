@@ -20,22 +20,27 @@
 	Place - Suite 330, Boston, MA 02111-1307, USA, or go to
 	http://www.gnu.org/copyleft/lesser.txt.
 	------------------------------------------------------------------------------------
-	Author:		Zhur
+	Author:		Almamu
 */
-#ifndef __ACCOUNTDB_H_INCL__
-#define __ACCOUNTDB_H_INCL__
+
+
+#ifndef __INSURANCEDB_H_INCL__
+#define __INSURANCEDB_H_INCL__
 
 #include "ServiceDB.h"
 
-class PyObject;
-
-class AccountDB : public ServiceDB
+class InsuranceDB
+: public ServiceDB
 {
 public:
-	PyObject *GetEntryTypes();
-	PyObject *GetKeyMap();
-	PyObjectEx *GetJournal(uint32 charID, uint32 refTypeID, uint32 accountKey, uint64 transDate);//mandela
-
-	bool CheckIfCorporation(uint32 corpID);
+	bool GetStationItems( std::vector<int32> &into, uint32 stationID, uint32 characterID );
+	PyRep* GetContracts( const std::vector<int32> &ships, uint32 characterID );
+	bool InsureShip( uint32 shipID, uint32 ownerID, double fraction );
+	bool UnInsureShip( uint32 shipID, uint32 characterID );
 };
+
+
+
 #endif
+
+

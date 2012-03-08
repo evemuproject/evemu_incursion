@@ -20,22 +20,36 @@
 	Place - Suite 330, Boston, MA 02111-1307, USA, or go to
 	http://www.gnu.org/copyleft/lesser.txt.
 	------------------------------------------------------------------------------------
-	Author:		Zhur
+	Author:		Almamu
 */
-#ifndef __ACCOUNTDB_H_INCL__
-#define __ACCOUNTDB_H_INCL__
 
-#include "ServiceDB.h"
 
-class PyObject;
+#ifndef __REPAIR_SERVICE_H_INCL__
+#define __REPAIR_SERVICE_H_INCL__
 
-class AccountDB : public ServiceDB
-{
+#include "ship/InsuranceDB.h"
+#include "PyService.h"
+
+class RepairService
+: public PyService {
 public:
-	PyObject *GetEntryTypes();
-	PyObject *GetKeyMap();
-	PyObjectEx *GetJournal(uint32 charID, uint32 refTypeID, uint32 accountKey, uint64 transDate);//mandela
+	RepairService(PyServiceMgr *mgr);
+	virtual ~RepairService();
 
-	bool CheckIfCorporation(uint32 corpID);
+protected:
+	class Dispatcher;
+	Dispatcher *const m_dispatch;
+
+	InsuranceDB m_db;
+
+	PyCallable_DECL_CALL(UnasembleItems)
+
+	//overloaded in order to support bound objects:
+	virtual PyBoundObject *_CreateBoundObject(Client *c, const PyRep *bind_args);
 };
+
+
+
 #endif
+
+
