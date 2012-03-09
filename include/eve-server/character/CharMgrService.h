@@ -49,7 +49,6 @@ protected:
 	PyCallable_DECL_CALL(GetCloneTypeID)
 	PyCallable_DECL_CALL(GetHomeStation)
 	PyCallable_DECL_CALL(GetFactions)
-	//PyCallable_DECL_CALL(ListStations)
 
 	//overloaded in order to support bound objects:
 	virtual PyBoundObject *_CreateBoundObject(Client *c, const PyRep *bind_args);

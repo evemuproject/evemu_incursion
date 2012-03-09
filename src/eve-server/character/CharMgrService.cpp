@@ -42,7 +42,7 @@ public:
 
         m_strBoundObjectName = "CharMgrBound";
 
-        //STUBBS
+        // Partially Implemented
         PyCallable_REG_CALL(CharMgrBound, ListStations)
 
         
@@ -54,7 +54,7 @@ public:
     }
 
 
-    // STUBBS
+    // Partially Implemented
     PyCallable_DECL_CALL(ListStations)
 
     
@@ -78,7 +78,6 @@ CharMgrService::CharMgrService(PyServiceMgr *mgr)
 	PyCallable_REG_CALL(CharMgrService, GetCloneTypeID)
 	PyCallable_REG_CALL(CharMgrService, GetHomeStation)
 	PyCallable_REG_CALL(CharMgrService, GetFactions)
-	//PyCallable_REG_CALL(CharMgrService, ListStations)
 }
 
 CharMgrService::~CharMgrService() {
@@ -205,31 +204,15 @@ PyResult CharMgrService::Handle_GetFactions( PyCallArgs& call )
 
 PyResult CharMgrBound::Handle_ListStations( PyCallArgs& call )
 {
-	sLog.Debug( "CharMgrService", "Called ListStations stub." );
+	/* Call *might* have 2 Args, I'm not sure how to determine this yet
+		blueprintOnly
+		isCorp
 
-	return NULL;
+		TODO: Stop ignoring Args
+	*/
+	sLog.Debug( "CharMgrService", "Called ListStations partial stub." );
+
+	return m_db.GetCharStations(call.client->GetCharacterID());
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
