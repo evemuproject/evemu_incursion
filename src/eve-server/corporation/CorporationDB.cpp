@@ -1327,3 +1327,16 @@ PyRep *CorporationDB::GetMyShares(uint32 charID) {
     }
     return DBResultToRowset(res);
 }
+
+PyRep *CorporationDB::GetCorporationOffices(uint32 corpID) {
+	DBQueryResult res;
+	if (!sDatabase.RunQuery(res,
+		" SELECT corporationID, itemID, officeFolderID "
+		" FROM crpoffices "
+		" WHERE corporationID = %u ", corpID))
+	{
+		codelog(SERVICE__ERROR, "Error in query: %s", res.error.c_str());
+		return NULL;
+	}
+	return DBResultToIndexRowset(res, "corporationID");
+}

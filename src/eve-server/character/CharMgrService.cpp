@@ -27,6 +27,43 @@
 
 PyCallable_Make_InnerDispatcher(CharMgrService)
 
+class CharMgrBound
+: public PyBoundObject
+{
+public:
+    PyCallable_Make_Dispatcher(CharMgrBound)
+
+    CharMgrBound(PyServiceMgr *mgr, CharacterDB& db)
+    : PyBoundObject(mgr),
+      m_db(db),
+      m_dispatch(new Dispatcher(this))
+    {
+        _SetCallDispatcher(m_dispatch);
+
+        m_strBoundObjectName = "CharMgrBound";
+
+        //STUBBS
+        PyCallable_REG_CALL(CharMgrBound, ListStations)
+
+        
+    }
+    virtual ~CharMgrBound() { delete m_dispatch; }
+    virtual void Release() {
+        //I hate this statement
+        delete this;
+    }
+
+
+    // STUBBS
+    PyCallable_DECL_CALL(ListStations)
+
+    
+protected:
+    CharacterDB& m_db;
+
+    Dispatcher *const m_dispatch;
+};
+
 CharMgrService::CharMgrService(PyServiceMgr *mgr)
 : PyService(mgr, "charMgr"),
   m_dispatch(new Dispatcher(this))
@@ -41,10 +78,19 @@ CharMgrService::CharMgrService(PyServiceMgr *mgr)
 	PyCallable_REG_CALL(CharMgrService, GetCloneTypeID)
 	PyCallable_REG_CALL(CharMgrService, GetHomeStation)
 	PyCallable_REG_CALL(CharMgrService, GetFactions)
+	//PyCallable_REG_CALL(CharMgrService, ListStations)
 }
 
 CharMgrService::~CharMgrService() {
 	delete m_dispatch;
+}
+
+PyBoundObject* CharMgrService::_CreateBoundObject( Client* c, const PyRep* bind_args )
+{
+    _log( CLIENT__MESSAGE, "CharMgrService bind request for:" );
+    bind_args->Dump( CLIENT__MESSAGE, "    " );
+
+    return new CharMgrBound( m_manager, m_db );
 }
 
 PyResult CharMgrService::Handle_GetContactList(PyCallArgs &call)
@@ -153,6 +199,13 @@ PyResult CharMgrService::Handle_GetHomeStation( PyCallArgs& call )
 PyResult CharMgrService::Handle_GetFactions( PyCallArgs& call )
 {
 	sLog.Debug( "CharMgrService", "Called GetFactions stub." );
+
+	return NULL;
+}
+
+PyResult CharMgrBound::Handle_ListStations( PyCallArgs& call )
+{
+	sLog.Debug( "CharMgrService", "Called ListStations stub." );
 
 	return NULL;
 }

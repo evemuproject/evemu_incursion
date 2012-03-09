@@ -611,9 +611,10 @@ PyResult CorpStationMgrIMBound::Handle_GetNumberOfUnrentedOffices( PyCallArgs &c
 
 PyResult CorpStationMgrIMBound::Handle_GetCorporateStationOffice(PyCallArgs &call)
 {
-	sLog.Debug("Server","Called GetCorporateStationOffice Stub");
-
-	return NULL;
+	//Not sure This function works as intended yet, but the error when logging in into a station is gone.
+	sLog.Debug("Server","Called GetCorporateStationOffice Partial Stub");
+	
+	return m_db.GetCorporationOffices(call.client->GetCorporationID());
 }
 
 
