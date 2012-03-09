@@ -31,7 +31,7 @@
 
 MEffect::MEffect()
 {
-    /* nothing to do */
+    m_EffectID = 0;
 }
 
 MEffect::~MEffect()
@@ -132,14 +132,9 @@ void MEffect::Populate(uint32 effectID)
 
 // ////////////////////// ModuleEffects Class ////////////////////////////
 
-ModuleEffects::ModuleEffects(uint32 typeID) : m_TypeID( typeID ), m_Cached( false )
+ModuleEffects::ModuleEffects(uint32 typeID) : m_typeID( typeID ), m_Cached( false )
 {
-    m_TypeID = 0;
-	m_EffectIDs = NULL;
-	m_Effects = NULL;
-	m_DefaultEffect = 0;
-	m_EffectCount = 0;
-	m_SelectedEffect = 0;
+    m_typeID = 0;
 	m_HighPower = m_MediumPower = m_LowPower = m_Cached = false;
 
     _populate(typeID);
@@ -148,12 +143,8 @@ ModuleEffects::ModuleEffects(uint32 typeID) : m_TypeID( typeID ), m_Cached( fals
 ModuleEffects::~ModuleEffects()
 {
 	//delete arrays
-	delete[] m_Effects;
-	delete[] m_EffectIDs;
 
 	//null ptrs
-	m_EffectIDs = NULL;
-	m_Effects = NULL;
 }
 
 //useful accessors - probably a better way to do this, but at least it's fast

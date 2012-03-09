@@ -37,6 +37,45 @@ public:
 
 	void Populate(uint32 effectID);
 
+	//accessors for selected effect
+	uint32 GetEffectID()										{ return (m_EffectID == 0) ? 0 : m_EffectID; }
+	std::string GetEffectName()									{ return (m_EffectID == 0) ? std::string("") : m_EffectName; }
+	uint32 GetEffectCategory()									{ return (m_EffectID == 0) ? 0 : m_EffectCategory; }
+	uint32 GetPreExpression()									{ return (m_EffectID == 0) ? 0 : m_PreExpression; }
+	uint32 GetPostExpression()									{ return (m_EffectID == 0) ? 0 : m_PostExpression; }
+	std::string GetDescription()								{ return (m_EffectID == 0) ? std::string("") : m_Description; }
+	std::string GetGuid()										{ return (m_EffectID == 0) ? std::string("") : m_Guid; }
+	uint32 GetIconID()											{ return (m_EffectID == 0) ? 0 : m_IconID; }
+	bool GetIsOffensive()										{ return (m_EffectID == 0) ? false : m_IsOffensive == 1; }
+	bool GetIsAssistance()										{ return (m_EffectID == 0) ? false : m_IsAssistance == 1; }
+	uint32 GetDurationAttributeID()								{ return (m_EffectID == 0) ? 0 : m_DurationAttributeID; }
+	uint32 GetTrackingSpeedAttributeID()						{ return (m_EffectID == 0) ? 0 : m_TrackingSpeedAttributeID; }
+	uint32 GetDischargeAttributeID()							{ return (m_EffectID == 0) ? 0 : m_DischargeAttributeID; }
+	uint32 GetRangeAttributeID()								{ return (m_EffectID == 0) ? 0 : m_RangeAttributeID; }
+	uint32 GetFalloffAttributeID()								{ return (m_EffectID == 0) ? 0 : m_FalloffAttributeID; }
+	bool GetDisallowAutoRepeat()								{ return (m_EffectID == 0) ? false : m_DisallowAutoRepeat == 1; }
+	bool GetIsPublished()										{ return (m_EffectID == 0) ? false : m_Published == 1; }
+	std::string GetDisplayName()								{ return (m_EffectID == 0) ? std::string("") : m_DisplayName; }
+	bool GetIsWarpSafe()										{ return (m_EffectID == 0) ? false : m_IsWarpSafe == 1; }
+	bool GetRangeChance()										{ return (m_EffectID == 0) ? false : m_RangeChance == 1; }
+	bool GetPropulsionChance()									{ return (m_EffectID == 0) ? false : m_PropulsionChance == 1; }
+	bool GetElectronicChance()									{ return (m_EffectID == 0) ? false : m_ElectronicChance == 1; }
+	uint32 GetDistribution()									{ return (m_EffectID == 0) ? 0 : m_Distribution; }
+	std::string GetSfxName()									{ return (m_EffectID == 0) ? std::string("") : m_DisplayName; }
+	uint32 GetNpcUsageChanceAttributeID()						{ return (m_EffectID == 0) ? 0 : m_NpcUsageChanceAttributeID; }
+	uint32 GetNpcActivationChanceAttributeID()					{ return (m_EffectID == 0) ? 0 : m_NpcActivationChanceAttributeID; }
+	uint32 GetFittingUsageChanceAttributeID()					{ return (m_EffectID == 0) ? 0 : m_FittingUsageChanceAttributeID; }
+
+	//accessors for the effects targetAttributeID, sourceAttributeID and calculation type
+	uint32 GetSizeOfAttributeList()								{ return (m_EffectID == 0) ? 0 : m_numOfIDs; }
+	uint32 GetTargetAttributeID(uint32 count)					{ return (m_EffectID == 0) ? 0 : m_TargetAttributeIDs[count]; }
+	uint32 GetSourceAttributeID(uint32 count)					{ return (m_EffectID == 0) ? 0 : m_SourceAttributeIDs[count]; }
+	EVECalculationType GetCalculationType(uint32 count)			{ return (m_EffectID == 0) ? (EVECalculationType)0 : (EVECalculationType)m_CalculationTypeID[count];}
+	EVECalculationType GetReverseCalculationType(uint32 count)	{ return (m_EffectID == 0) ? (EVECalculationType)0 : (EVECalculationType)m_ReverseCalculationTypeID[count];}
+	uint32 GetModuleStateWhenEffectApplied(uint32 count)		{ return (m_EffectID == 0) ? 0 : m_EffectAppliedWhenIDs[count]; }
+	uint32 GetTargetTypeToWhichEffectApplied(uint32 count)		{ return (m_EffectID == 0) ? 0 : m_EffectAppliedTargetIDs[count]; }
+
+private:
 	int * m_TargetAttributeIDs;
 	int * m_SourceAttributeIDs;
 	int * m_CalculationTypeID;
@@ -84,70 +123,27 @@ public:
 	ModuleEffects(uint32 typeID);
 	~ModuleEffects();
 
+	//this will need to be reworked to implement a singleton architecture...i'll do it later -luck
+
 	//useful accessors - probably a better way to do this, but at least it's fast
 	bool isHighSlot();
 	bool isMediumSlot();
 	bool isLowSlot();
 
-	//this will need to be reworked to implement a singleton architecture...i'll do it later -luck
-
-	//this class uses a system to set the "active effect" that you want to get information about
-	//returns false if the effect specified is not found
-	bool SetActiveEffect(uint32 effectID);
-	//bool SetDefaultEffectAsActive();
-
-	//accessors for selected effect
-	uint32 GetEffectID()										{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_EffectID; }
-	std::string GetEffectName()									{ return (m_Effects == NULL) ? std::string("") : m_Effects[m_SelectedEffect].m_EffectName; }
-	uint32 GetEffectCategory()									{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_EffectCategory; }
-	uint32 GetPreExpression()									{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_PreExpression; }
-	uint32 GetPostExpression()									{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_PostExpression; }
-	std::string GetDescription()								{ return (m_Effects == NULL) ? std::string("") : m_Effects[m_SelectedEffect].m_Description; }
-	std::string GetGuid()										{ return (m_Effects == NULL) ? std::string("") : m_Effects[m_SelectedEffect].m_Guid; }
-	uint32 GetIconID()											{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_IconID; }
-	bool GetIsOffensive()										{ return (m_Effects == NULL) ? false : m_Effects[m_SelectedEffect].m_IsOffensive == 1; }
-	bool GetIsAssistance()										{ return (m_Effects == NULL) ? false : m_Effects[m_SelectedEffect].m_IsAssistance == 1; }
-	uint32 GetDurationAttributeID()								{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_DurationAttributeID; }
-	uint32 GetTrackingSpeedAttributeID()						{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_TrackingSpeedAttributeID; }
-	uint32 GetDischargeAttributeID()							{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_DischargeAttributeID; }
-	uint32 GetRangeAttributeID()								{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_RangeAttributeID; }
-	uint32 GetFalloffAttributeID()								{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_FalloffAttributeID; }
-	bool GetDisallowAutoRepeat()								{ return (m_Effects == NULL) ? false : m_Effects[m_SelectedEffect].m_DisallowAutoRepeat == 1; }
-	bool GetIsPublished()										{ return (m_Effects == NULL) ? false : m_Effects[m_SelectedEffect].m_Published == 1; }
-	std::string GetDisplayName()								{ return (m_Effects == NULL) ? std::string("") : m_Effects[m_SelectedEffect].m_DisplayName; }
-	bool GetIsWarpSafe()										{ return (m_Effects == NULL) ? false : m_Effects[m_SelectedEffect].m_IsWarpSafe == 1; }
-	bool GetRangeChance()										{ return (m_Effects == NULL) ? false : m_Effects[m_SelectedEffect].m_RangeChance == 1; }
-	bool GetPropulsionChance()									{ return (m_Effects == NULL) ? false : m_Effects[m_SelectedEffect].m_PropulsionChance == 1; }
-	bool GetElectronicChance()									{ return (m_Effects == NULL) ? false : m_Effects[m_SelectedEffect].m_ElectronicChance == 1; }
-	uint32 GetDistribution()									{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_Distribution; }
-	std::string GetSfxName()									{ return (m_Effects == NULL) ? std::string("") : m_Effects[m_SelectedEffect].m_DisplayName; }
-	uint32 GetNpcUsageChanceAttributeID()						{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_NpcUsageChanceAttributeID; }
-	uint32 GetNpcActivationChanceAttributeID()					{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_NpcActivationChanceAttributeID; }
-	uint32 GetFittingUsageChanceAttributeID()					{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_FittingUsageChanceAttributeID; }
-
-	//accessors for the effects targetAttributeID, sourceAttributeID and calculation type
-	uint32 GetSizeOfAttributeList()								{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_numOfIDs; }
-	uint32 GetTargetAttributeID(uint32 count)					{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_TargetAttributeIDs[count]; }
-	uint32 GetSourceAttributeID(uint32 count)					{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_SourceAttributeIDs[count]; }
-	EVECalculationType GetCalculationType(uint32 count)			{ return (m_Effects == NULL) ? (EVECalculationType)0 : (EVECalculationType)m_Effects[m_SelectedEffect].m_CalculationTypeID[count];}
-	EVECalculationType GetReverseCalculationType(uint32 count)	{ return (m_Effects == NULL) ? (EVECalculationType)0 : (EVECalculationType)m_Effects[m_SelectedEffect].m_ReverseCalculationTypeID[count];}
-	uint32 GetModuleStateWhenEffectApplied(uint32 count)		{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_EffectAppliedWhenIDs[count]; }
-	uint32 GetTargetTypeToWhichEffectApplied(uint32 count)		{ return (m_Effects == NULL) ? 0 : m_Effects[m_SelectedEffect].m_EffectAppliedTargetIDs[count]; }
+    std::map<uint32, MEffect *>::const_iterator GetOnlineEffectsConstIterator() { return m_OnlineEffects.begin(); }
+    std::map<uint32, MEffect *>::const_iterator GetActiveEffectsConstIterator() { return m_ActiveEffects.begin(); }
+    std::map<uint32, MEffect *>::const_iterator GetOverloadEffectsConstIterator() { return m_OverloadEffects.begin(); }
 
 private:
 
 	void _populate(uint32 typeID);
 
 	//data members
-	int m_TypeID;
-	//int *m_EffectIDs;
-	//MEffect * m_Effects;
+    std::map<uint32, MEffect *> m_OnlineEffects;
+    std::map<uint32, MEffect *> m_ActiveEffects;
+    std::map<uint32, MEffect *> m_OverloadEffects;
 
-    //uint32 m_DefaultEffect;
-
-	//internal counters
-	uint32 m_EffectCount;
-	//uint32 m_SelectedEffect;
+    uint32 m_typeID;
 
 	//cached stuff
 	bool m_HighPower, m_MediumPower, m_LowPower, m_Cached;
