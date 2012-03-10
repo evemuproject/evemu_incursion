@@ -66,6 +66,7 @@ public:
         // STUBBS
         PyCallable_REG_CALL(CorpRegistryBound, GetMember)
         PyCallable_REG_CALL(CorpRegistryBound, GetMembers)
+		PyCallable_REG_CALL(CorpRegistryBound, GetSharesByShareholder)
 
         
     }
@@ -98,6 +99,7 @@ public:
     // STUBBS
     PyCallable_DECL_CALL(GetMember)
     PyCallable_DECL_CALL(GetMembers)
+    PyCallable_DECL_CALL(GetSharesByShareholder)
 
     
 
@@ -321,6 +323,7 @@ bool CorpRegistryBound::JoinCorporation(Client *who, uint32 newCorpID, const Cor
 PyResult CorpRegistryBound::Handle_GetMember(PyCallArgs &call) {
 //    uint32 item = 0;
     //item += 1;
+	sLog.Debug( "CorpRegistryBound", "Called GetMember stub." );
     return NULL;
 }
 
@@ -382,6 +385,8 @@ PyClass
         dict["N=707075:302"]=0x1CC2383E961BFA8
 */
 PyResult CorpRegistryBound::Handle_GetMembers(PyCallArgs &call) {
+	
+	sLog.Debug( "CorpRegistryBound", "Called GetMembers stub." );
     return NULL;
 }
 
@@ -1000,4 +1005,8 @@ PyResult CorpRegistryBound::Handle_UpdateLogo(PyCallArgs &call) {
     m_manager->entity_list.Multicast("OnCorporationChanged", "corpid", &answer, mct);
 
     return m_db.GetCorporation(notif.key);
+}
+
+PyResult CorpRegistryBound::Handle_GetSharesByShareholder(PyCallArgs &call) {
+	return m_db.GetMyShares(call.client->GetCharacterID());
 }
