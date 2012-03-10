@@ -154,7 +154,7 @@ bool ModuleEffects::isHighSlot()
 		return m_HighPower;
 	else
 	{
-		for(uint32 i = 0; i < m_EffectCount; i++)
+	/*	for(uint32 i = 0; i < m_EffectCount; i++)
 		{
 			if( m_EffectIDs[i] == effectHiPower )
 			{
@@ -164,7 +164,7 @@ bool ModuleEffects::isHighSlot()
 				m_Cached = true; //cache the result
 				return true;
 			}
-		}
+		}*/
 	}
 
     return false;
@@ -176,7 +176,7 @@ bool ModuleEffects::isMediumSlot()
 		return m_MediumPower;
 	else
 	{
-		for(uint32 i = 0; i < m_EffectCount; i++)
+	/*	for(uint32 i = 0; i < m_EffectCount; i++)
 		{
 			if( m_EffectIDs[i] == effectMedPower )
 			{
@@ -186,7 +186,7 @@ bool ModuleEffects::isMediumSlot()
 				m_Cached = true;  //cache the result
 				return true;
 			}
-		}
+		}*/
 	}
 
     return false;
@@ -198,7 +198,7 @@ bool ModuleEffects::isLowSlot()
 		return m_LowPower;
 	else
 	{
-		for(uint32 i = 0; i < m_EffectCount; i++)
+	/*	for(uint32 i = 0; i < m_EffectCount; i++)
 		{
 			if( m_EffectIDs[i] == effectLoPower )
 			{
@@ -208,43 +208,13 @@ bool ModuleEffects::isLowSlot()
 				m_Cached = true; //cache the result
 				return true;
 			}
-		}
+		}*/
 	}
 
     return false;
 }
 
 //this will need to be reworked to implement a singleton architecture...i'll do it later -luck
-
-//this class uses a system to set the "active effect" that you want to get information about
-//returns false if the effect specified is not found
-bool ModuleEffects::SetActiveEffect(uint32 effectID)
-{
-	//iterate through the effects to find the one we want
-	for(uint32 i = 0; i < m_EffectCount; i++)
-	{
-		if(m_EffectIDs[i] == effectID)
-		{
-			m_SelectedEffect = i;
-			return true;
-		}
-
-	}
-
-	return false;
-}
-
-bool ModuleEffects::SetDefaultEffectAsActive()
-{
-	//iterate through the effects to find the one we want
-	if(m_DefaultEffect != 0)
-	{
-		m_SelectedEffect = m_DefaultEffect;
-		return true;
-	}
-
-	return false;
-}
 
 
 // ////////////////// PRIVATE MEMBERS /////////////////////////
@@ -255,10 +225,6 @@ void ModuleEffects::_populate(uint32 typeID)
 	DBQueryResult *res = new DBQueryResult();
 	ModuleDB::GetDgmTypeEffectsInformation(typeID, *res);
 
-	//initialize our container to the correct size
-	m_Effects = new MEffect[res->GetRowCount()];
-	m_EffectIDs = new int[res->GetRowCount()];
-
 	//counter
 	int i = 0;
 
@@ -267,20 +233,18 @@ void ModuleEffects::_populate(uint32 typeID)
 	while( res->GetRow(row) )
 	{
 		//add new stuff to the arrays
-		m_EffectIDs[i] = row.GetInt(0);
-		m_Effects[i] = *new MEffect();
+		//m_EffectIDs[i] = row.GetInt(0);
+		//m_Effects[i] = *new MEffect();
 
 		//check if this is the default effect
-		if( row.GetInt(1) )
-			m_DefaultEffect = i;
+		//if( row.GetInt(1) )
+		//	m_DefaultEffect = i;
 
 		//populate the new MEffect
-		m_Effects[i].Populate(row.GetInt(0));
+		//m_Effects[i].Populate(row.GetInt(0));
 
 		i++; //increment
 	}
-
-	m_EffectCount = i;
 
 	//cleanup
 	delete res;

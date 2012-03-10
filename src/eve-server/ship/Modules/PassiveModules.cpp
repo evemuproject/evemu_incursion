@@ -50,11 +50,11 @@ PassiveModule::~PassiveModule()
 void PassiveModule::Offline() 
 {
 	//remove item attributes
-	m_Effects->SetDefaultEffectAsActive();
-	for(uint32 i = 0; i < m_Effects->GetSizeOfAttributeList(); i++)
-	{
-		m_ShipAttrComp->ModifyShipAttribute(m_Effects->GetTargetAttributeID(i), m_Effects->GetSourceAttributeID(i), m_Effects->GetReverseCalculationType(i));
-	}
+	//m_Effects->SetDefaultEffectAsActive();
+	//for(uint32 i = 0; i < m_Effects->GetSizeOfAttributeList(); i++)
+	//{
+	//	m_ShipAttrComp->ModifyShipAttribute(m_Effects->GetTargetAttributeID(i), m_Effects->GetSourceAttributeID(i), m_Effects->GetReverseCalculationType(i));
+	//}
 
 	//change item state
 	m_Item->PutOffline();
@@ -63,11 +63,11 @@ void PassiveModule::Offline()
 void PassiveModule::Online()
 {
 	//add item attributes
-	m_Effects->SetDefaultEffectAsActive();
-	for(uint32 i = 0; i < m_Effects->GetSizeOfAttributeList(); i++)
-	{
-		m_ShipAttrComp->ModifyShipAttribute(m_Effects->GetTargetAttributeID(i), m_Effects->GetSourceAttributeID(i), m_Effects->GetCalculationType(i));
-	}
+	//m_Effects->SetDefaultEffectAsActive();
+	//for(uint32 i = 0; i < m_Effects->GetSizeOfAttributeList(); i++)
+	//{
+	//	m_ShipAttrComp->ModifyShipAttribute(m_Effects->GetTargetAttributeID(i), m_Effects->GetSourceAttributeID(i), m_Effects->GetCalculationType(i));
+	//}
 
 	//change item state
 	m_Item->PutOnline();

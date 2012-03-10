@@ -1394,13 +1394,15 @@ void DestinyManager::SendTerminalExplosion() const {
 	std::vector<PyTuple *> updates;
 	
     //Clear any pending docking operation since the user's ship exploded:
-    m_self->CastToClient()->SetPendingDockOperation( false );
+    if( m_self->CastToClient() != NULL )
+        m_self->CastToClient()->SetPendingDockOperation( false );
 
 	{
 		//send a warping special effects update...
 		DoDestiny_TerminalExplosion du;
 		du.entityID = m_self->GetID();
-		du.unknown = 1206;	//no idead right now.
+		du.unknownInt = 1206;	// this seems to be different every so often in the logs, no idea what it means
+        du.unknownBool = false; // this always seems to be false, no idea what it means
 		updates.push_back(du.Encode());
 	}
 	

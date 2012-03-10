@@ -82,18 +82,18 @@ public:
     virtual bool isTurretFitted()
     {
         // Try to make the effect called 'turretFitted' active, if it exists, to test for module being a turret:
-        if( m_Effects->SetActiveEffect(42) )
-            return true;
-        else
+        //if( m_Effects->SetActiveEffect(42) )
+        //    return true;
+        //else
             return false;
     }
 
     virtual bool isLauncherFitted()
     {
         // Try to make the effect called 'launcherFitted' active, if it exists, to test for module being a launcher:
-        if( m_Effects->SetActiveEffect(40) )
-            return true;
-        else
+        //if( m_Effects->SetActiveEffect(40) )
+        //    return true;
+        //else
             return false;
     }
 
