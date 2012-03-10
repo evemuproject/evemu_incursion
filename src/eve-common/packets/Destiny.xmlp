@@ -733,7 +733,9 @@ DST_WARPEXIT = 11
 	    <tupleInline>
 		    <int name="entityID" />
 		    <!-- seen 1206 -->
-		    <int name="unknown" />
+		    <int name="unknownInt" />
+            <!-- always seems to be false -->
+            <bool name="unknownBool" />
 	    </tupleInline>
 	  </tupleInline>
   </elementDef>
