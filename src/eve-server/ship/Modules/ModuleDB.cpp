@@ -74,7 +74,8 @@ void ModuleDB::GetDgmEffectsInfo(uint32 effectID, DBQueryResult &res)
 		" calculationTypeID, "
 		" reverseCalculationTypeID, "
         " effectAppliedInState, "
-        " effectAppliedTo "
+        " effectAppliedTo, "
+        " effectApplicationType "
 		" FROM dgmEffectsInfo "
 		" WHERE effectID = '%u' ",
 		effectID))

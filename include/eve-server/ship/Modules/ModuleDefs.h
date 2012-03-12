@@ -63,6 +63,7 @@ enum ChargeStates
 };
 
 // These are the module states where an effect will, ahem, take 'effect':
+// *** use these values to decode the 'effectAppliedInState' field of the 'dgmEffectsInfo' database table
 enum ModuleEffectTriggers
 {
     EFFECT_ONLINE,              // means the effect takes effect on the target (see below) upon entering the ONLINE state
@@ -71,6 +72,7 @@ enum ModuleEffectTriggers
 };
 
 // These are the targets to which module effects are applied when activated:
+// *** use these values to decode the 'effectAppliedTo' field of the 'dgmEffectsInfo' database table
 enum ModuleEffectTargets
 {
     SELF,           // means the target of the effect is the module's own attribute(s)
@@ -79,6 +81,7 @@ enum ModuleEffectTargets
 };
 
 // These are the methods by which module effects are applied to the designated target:
+// *** use these values to decode the 'effectApplicationType' field of the 'dgmEffectsInfo' database table
 enum ModuleApplicationTypes
 {
     EFFECT_ACTIVE_MAINTAIN,     // applied by ACTIVE modules where an effect is maintained; means the effect takes effect on the

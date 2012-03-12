@@ -32,10 +32,8 @@
 class MEffect
 {
 public:
-	MEffect();
+	MEffect(uint32 effectID);
 	~MEffect();
-
-	void Populate(uint32 effectID);
 
 	//accessors for selected effect
 	uint32 GetEffectID()										{ return (m_EffectID == 0) ? 0 : m_EffectID; }
@@ -68,22 +66,15 @@ public:
 
 	//accessors for the effects targetAttributeID, sourceAttributeID and calculation type
 	uint32 GetSizeOfAttributeList()								{ return (m_EffectID == 0) ? 0 : m_numOfIDs; }
-	uint32 GetTargetAttributeID(uint32 count)					{ return (m_EffectID == 0) ? 0 : m_TargetAttributeIDs[count]; }
-	uint32 GetSourceAttributeID(uint32 count)					{ return (m_EffectID == 0) ? 0 : m_SourceAttributeIDs[count]; }
-	EVECalculationType GetCalculationType(uint32 count)			{ return (m_EffectID == 0) ? (EVECalculationType)0 : (EVECalculationType)m_CalculationTypeID[count];}
-	EVECalculationType GetReverseCalculationType(uint32 count)	{ return (m_EffectID == 0) ? (EVECalculationType)0 : (EVECalculationType)m_ReverseCalculationTypeID[count];}
-	uint32 GetModuleStateWhenEffectApplied(uint32 count)		{ return (m_EffectID == 0) ? 0 : m_EffectAppliedWhenIDs[count]; }
-	uint32 GetTargetTypeToWhichEffectApplied(uint32 count)		{ return (m_EffectID == 0) ? 0 : m_EffectAppliedTargetIDs[count]; }
+	uint32 GetTargetAttributeID(uint32 index)					{ return (m_EffectID == 0) ? 0 : m_TargetAttributeIDs[index]; }
+	uint32 GetSourceAttributeID(uint32 index)					{ return (m_EffectID == 0) ? 0 : m_SourceAttributeIDs[index]; }
+	EVECalculationType GetCalculationType(uint32 index)			{ return (m_EffectID == 0) ? (EVECalculationType)0 : (EVECalculationType)m_CalculationTypeIDs[index];}
+	EVECalculationType GetReverseCalculationType(uint32 index)	{ return (m_EffectID == 0) ? (EVECalculationType)0 : (EVECalculationType)m_ReverseCalculationTypeIDs[index];}
+	uint32 GetModuleStateWhenEffectApplied(uint32 index)		{ return (m_EffectID == 0) ? 0 : m_EffectAppliedWhenIDs[index]; }
+	uint32 GetTargetTypeToWhichEffectApplied(uint32 index)		{ return (m_EffectID == 0) ? 0 : m_EffectAppliedTargetIDs[index]; }
 
 private:
-	int * m_TargetAttributeIDs;
-	int * m_SourceAttributeIDs;
-	int * m_CalculationTypeID;
-	int * m_ReverseCalculationTypeID;
-    int * m_EffectAppliedWhenIDs;
-    int * m_EffectAppliedTargetIDs;
-    int * m_EffectApplicationTypeIDs;
-	int m_numOfIDs;
+	void _Populate(uint32 effectID);
 
 	int m_EffectID;
 	std::string m_EffectName;
@@ -113,6 +104,14 @@ private:
 	int m_NpcActivationChanceAttributeID;
 	int m_FittingUsageChanceAttributeID;
 
+	int m_numOfIDs;
+	int * m_TargetAttributeIDs;
+	int * m_SourceAttributeIDs;
+	int * m_CalculationTypeIDs;
+	int * m_ReverseCalculationTypeIDs;
+    int * m_EffectAppliedWhenIDs;
+    int * m_EffectAppliedTargetIDs;
+    int * m_EffectApplicationTypeIDs;
 };
 
 //class contained by all modules that is populated on construction of the module
@@ -129,6 +128,8 @@ public:
 	bool isHighSlot();
 	bool isMediumSlot();
 	bool isLowSlot();
+    bool HasEffect(uint32 effectID);
+    MEffect * GetEffect(uint32 effectID);
 
     std::map<uint32, MEffect *>::const_iterator GetOnlineEffectsConstIterator() { return m_OnlineEffects.begin(); }
     std::map<uint32, MEffect *>::const_iterator GetActiveEffectsConstIterator() { return m_ActiveEffects.begin(); }
