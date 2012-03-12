@@ -188,6 +188,30 @@ PyRep *CharacterDB::GetCharSelectInfo(uint32 characterID) {
 	return DBResultToCRowset(res);
 }
 
+
+// Should probably make this function more generic once we know how the Args to CharMgrBound::Handle_ListStations work
+PyRep *CharacterDB::GetCharStations(uint32 charID) {
+	DBQueryResult res;
+
+	//Query returns StationID, ItemCount
+	if(!sDatabase.RunQuery(res,
+		" SELECT stationID, count(stationID) as itemCount "
+		" FROM ( "
+		"	SELECT stationID, locationID "
+		"	FROM entity, stastations "
+		"	WHERE entity.locationID = stastations.stationID "
+		"		and ownerID = %u "
+		" ) as a "
+		" GROUP BY stationID ", charID))
+	{
+		codelog(SERVICE__ERROR, "Error in query: %s", res.error.c_str());
+		return NULL;
+	}
+
+	return DBResultToRowset(res);
+}
+
+
 PyObject *CharacterDB::GetCharPublicInfo(uint32 characterID) {
 	DBQueryResult res;
 
