@@ -141,6 +141,12 @@ ShipRef Ship::Spawn(ItemFactory &factory,
     // Warp Speed Multiplier
     if( !(sShipRef.get()->HasAttribute(AttrWarpSpeedMultiplier)) )
         sShipRef.get()->SetAttribute(AttrWarpSpeedMultiplier, 1.0f);
+    // CPU Load of the ship (new ships have zero load with no modules fitted, of course):
+    if( !(sShipRef.get()->HasAttribute(AttrCpuLoad)) )
+        sShipRef.get()->SetAttribute(AttrCpuLoad, 0);
+    // Power Load of the ship (new ships have zero load with no modules fitted, of course):
+    if( !(sShipRef.get()->HasAttribute(AttrPowerLoad)) )
+        sShipRef.get()->SetAttribute(AttrPowerLoad, 0);
 
     return sShipRef;
 }

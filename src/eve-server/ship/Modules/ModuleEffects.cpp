@@ -45,9 +45,10 @@ void MEffect::_Populate(uint32 effectID)
 	DBQueryResult *res = new DBQueryResult();
 	ModuleDB::GetDgmEffects(effectID, *res);
 
+    // First, get all general info on this effectID from the dgmEffects table:
 	DBResultRow row1;
 	if( !res->GetRow(row1) )
-		sLog.Error("MEffect","Could not populate effect information for effectID: %u", effectID);
+		sLog.Error("MEffect","Could not populate effect information for effectID: %u from the 'dgmEffects' table", effectID);
 	else
 	{
 		//get all the data from the query
@@ -95,21 +96,17 @@ void MEffect::_Populate(uint32 effectID)
 			m_FittingUsageChanceAttributeID = row1.GetInt(25);
 	}
 
-	//next get the info from the dgmEffectsInfo table
+	// Next, get the info from the dgmEffectsInfo table:
 	ModuleDB::GetDgmEffectsInfo(effectID, *res);
 
 	DBResultRow row2;
 
-	//initialize the new tables
+	// Initialize the new tables
 	m_TargetAttributeIDs = new int[res->GetRowCount()];
 	m_SourceAttributeIDs = new int[res->GetRowCount()];
 	m_CalculationTypeIDs = new int[res->GetRowCount()];
 	m_ReverseCalculationTypeIDs = new int[res->GetRowCount()];
-    m_EffectAppliedWhenIDs = new int[res->GetRowCount()];
-    m_EffectAppliedTargetIDs = new int[res->GetRowCount()];
-    m_EffectApplicationTypeIDs = new int[res->GetRowCount()];
 
-	//counter
 	int count = 0;
 
 	while( res->GetRow(row2) )
@@ -118,13 +115,30 @@ void MEffect::_Populate(uint32 effectID)
 		m_SourceAttributeIDs[count] = row2.GetInt(1);
 		m_CalculationTypeIDs[count] = row2.GetInt(2);
 		m_ReverseCalculationTypeIDs[count] = row2.GetInt(3);
-        m_EffectAppliedWhenIDs[count] = row2.GetInt(4);
-        m_EffectAppliedTargetIDs[count] = row2.GetInt(5);
-        m_EffectApplicationTypeIDs[count] = row2.GetInt(6);
 		count++;
 	}
 
+    if( count == 0 )
+        sLog.Error("MEffect","Could not populate effect information for effectID: %u from the 'dgmEffectsInfo' table as the SQL query returned ZERO rows", effectID);
+
 	m_numOfIDs = count;
+
+	// Finally, get the info for this effectID from the dgmEffectsActions table:
+	ModuleDB::GetDgmEffectsActions(effectID, *res);
+
+	DBResultRow row3;
+
+    if( !(res->GetRow(row3)) )
+        sLog.Error("MEffect","Could not populate effect information for effectID: %u from 'dgmEffectsActions table", effectID);
+    else
+    {
+        m_EffectAppliedWhenID = row3.GetInt(0);
+        m_EffectAppliedTargetID = row3.GetInt(1);
+        m_EffectApplicationTypeID = row3.GetInt(2);
+        m_StackingPenaltyAppliedID = row3.GetInt(3);
+        m_NullifyOnlineEffectEnable = row3.GetInt(4);
+        m_NullifiedOnlineEffectID = row3.GetInt(5);
+    }
 
 	delete res;
 	res = NULL;

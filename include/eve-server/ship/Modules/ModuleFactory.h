@@ -55,7 +55,7 @@ static GenericModule* ModuleFactory(InventoryItemRef item, ShipRef ship)
             case EVEDB::invGroups::Armor_Coating:                           return (new PassiveModule(item, ship)); break;
             case EVEDB::invGroups::Armor_Repair_Projector:                  return NULL;    // Active
             case EVEDB::invGroups::Armor_Plating_Energized:                 return (new PassiveModule(item, ship)); break;
-            case EVEDB::invGroups::Armor_Hardener:                          return NULL;    // Active
+            case EVEDB::invGroups::Armor_Hardener:                          return (new ActiveModule(item, ship)); break;    // Active
             case EVEDB::invGroups::Armor_Reinforcer:                        return (new PassiveModule(item, ship)); break;
             case EVEDB::invGroups::Remote_Hull_Repairer:                    return NULL;    // Active
             case EVEDB::invGroups::Expanded_Cargohold:                      return (new PassiveModule(item, ship)); break;

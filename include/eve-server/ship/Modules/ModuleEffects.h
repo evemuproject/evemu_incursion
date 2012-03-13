@@ -64,14 +64,19 @@ public:
 	uint32 GetNpcActivationChanceAttributeID()					{ return (m_EffectID == 0) ? 0 : m_NpcActivationChanceAttributeID; }
 	uint32 GetFittingUsageChanceAttributeID()					{ return (m_EffectID == 0) ? 0 : m_FittingUsageChanceAttributeID; }
 
-	//accessors for the effects targetAttributeID, sourceAttributeID and calculation type
+	//accessors for the effects targetAttributeID, sourceAttributeID and calculation type:
 	uint32 GetSizeOfAttributeList()								{ return (m_EffectID == 0) ? 0 : m_numOfIDs; }
 	uint32 GetTargetAttributeID(uint32 index)					{ return (m_EffectID == 0) ? 0 : m_TargetAttributeIDs[index]; }
 	uint32 GetSourceAttributeID(uint32 index)					{ return (m_EffectID == 0) ? 0 : m_SourceAttributeIDs[index]; }
 	EVECalculationType GetCalculationType(uint32 index)			{ return (m_EffectID == 0) ? (EVECalculationType)0 : (EVECalculationType)m_CalculationTypeIDs[index];}
 	EVECalculationType GetReverseCalculationType(uint32 index)	{ return (m_EffectID == 0) ? (EVECalculationType)0 : (EVECalculationType)m_ReverseCalculationTypeIDs[index];}
-	uint32 GetModuleStateWhenEffectApplied(uint32 index)		{ return (m_EffectID == 0) ? 0 : m_EffectAppliedWhenIDs[index]; }
-	uint32 GetTargetTypeToWhichEffectApplied(uint32 index)		{ return (m_EffectID == 0) ? 0 : m_EffectAppliedTargetIDs[index]; }
+
+    uint32 GetModuleStateWhenEffectApplied(uint32 index)		{ return (m_EffectID == 0) ? 0 : m_EffectAppliedWhenID; }
+	uint32 GetTargetTypeToWhichEffectApplied(uint32 index)		{ return (m_EffectID == 0) ? 0 : m_EffectAppliedTargetID; }
+    uint32 GetEffectApplicationType(uint32 index)               { return (m_EffectID == 0) ? 0 : m_EffectApplicationTypeID; }
+    uint32 GetStackingPenaltyApplied(uint32 index)              { return (m_EffectID == 0) ? 0 : m_StackingPenaltyAppliedID; }
+    uint32 GetNullifyOnlineEffectEnable(uint32 index)           { return (m_EffectID == 0) ? 0 : m_NullifyOnlineEffectEnable; }
+    uint32 GetNullifiedOnlineEffectID(uint32 index)             { return (m_EffectID == 0) ? 0 : m_NullifiedOnlineEffectID; }
 
 private:
 	void _Populate(uint32 effectID);
@@ -109,9 +114,12 @@ private:
 	int * m_SourceAttributeIDs;
 	int * m_CalculationTypeIDs;
 	int * m_ReverseCalculationTypeIDs;
-    int * m_EffectAppliedWhenIDs;
-    int * m_EffectAppliedTargetIDs;
-    int * m_EffectApplicationTypeIDs;
+    int m_EffectAppliedWhenID;
+    int m_EffectAppliedTargetID;
+    int m_EffectApplicationTypeID;
+    int m_StackingPenaltyAppliedID;
+    int m_NullifyOnlineEffectEnable;
+    int m_NullifiedOnlineEffectID;
 };
 
 //class contained by all modules that is populated on construction of the module

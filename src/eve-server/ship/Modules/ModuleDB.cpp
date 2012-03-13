@@ -73,10 +73,25 @@ void ModuleDB::GetDgmEffectsInfo(uint32 effectID, DBQueryResult &res)
 		" sourceAttributeID, "
 		" calculationTypeID, "
 		" reverseCalculationTypeID, "
-        " effectAppliedInState, "
-        " effectAppliedTo, "
-        " effectApplicationType "
 		" FROM dgmEffectsInfo "
+		" WHERE effectID = '%u' ",
+		effectID))
+	{
+		_log(DATABASE__ERROR, "Error in query: %s", res.error.c_str());
+	}
+}
+
+void ModuleDB::GetDgmEffectsActions(uint32 effectID, DBQueryResult &res)
+{
+	if( !sDatabase.RunQuery(res,
+		" SELECT "
+		" effectAppliedInState, "
+		" effectAppliedTo, "
+		" effectApplicationType, "
+		" stackingPenaltyApplied, "
+        " nullifyOnlineEffect, "
+        " nullifiedOnlineEffectID, "
+		" FROM dgmEffectsActions "
 		" WHERE effectID = '%u' ",
 		effectID))
 	{
