@@ -72,7 +72,7 @@ void ModuleDB::GetDgmEffectsInfo(uint32 effectID, DBQueryResult &res)
 		" targetAttributeID, "
 		" sourceAttributeID, "
 		" calculationTypeID, "
-		" reverseCalculationTypeID, "
+		" reverseCalculationTypeID "
 		" FROM dgmEffectsInfo "
 		" WHERE effectID = '%u' ",
 		effectID))
@@ -90,7 +90,7 @@ void ModuleDB::GetDgmEffectsActions(uint32 effectID, DBQueryResult &res)
 		" effectApplicationType, "
 		" stackingPenaltyApplied, "
         " nullifyOnlineEffect, "
-        " nullifiedOnlineEffectID, "
+        " nullifiedOnlineEffectID "
 		" FROM dgmEffectsActions "
 		" WHERE effectID = '%u' ",
 		effectID))
