@@ -265,13 +265,16 @@ void ModuleEffects::_populate(uint32 typeID)
 	//counter
     MEffect * mEffectPtr;
     mEffectPtr = NULL;
+    m_defaultEffect = NULL;     // Set this to NULL until the default effect is found, if there is any
     uint32 effectID;
+    uint32 isDefault;
 
 	//go through and populate each effect
 	DBResultRow row;
 	while( res->GetRow(row) )
 	{
         effectID = row.GetInt(0);
+        isDefault = row.GetInt(1);
         switch( effectID )
         {
             case 11:    // loPower
@@ -286,6 +289,9 @@ void ModuleEffects::_populate(uint32 typeID)
                 break;
         }
         
+        if( isDefault > 0 )
+            m_defaultEffect = mEffectPtr;
+
         // This switch is assuming that all entries in 'dgmEffectsInfo' for this effectID are applied during the same module state,
         // which should really be the case anyway, for every effectID, so we just check index 0 of the effectIDs list of attributes
         // that are modified by this effect for which module state during which the effect is active:

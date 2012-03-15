@@ -220,6 +220,7 @@
 // item stuff
 #include "inventory/AttributeEnum.h"
 #include "inventory/AttributeMgr.h"
+#include "inventory/EffectsEnum.h"
 #include "inventory/EVEAttributeMgr.h"
 #include "inventory/InvBrokerService.h"
 #include "inventory/Inventory.h"

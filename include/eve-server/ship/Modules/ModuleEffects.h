@@ -137,6 +137,8 @@ public:
 	bool isMediumSlot();
 	bool isLowSlot();
     bool HasEffect(uint32 effectID);
+    bool HasDefaultEffect() { return ( (m_defaultEffect != NULL) ? true : false ); }
+    MEffect * GetDefaultEffect() { return m_defaultEffect; }
     MEffect * GetEffect(uint32 effectID);
 
     std::map<uint32, MEffect *>::const_iterator GetOnlineEffectsConstIterator() { return m_OnlineEffects.begin(); }
@@ -151,6 +153,7 @@ private:
     std::map<uint32, MEffect *> m_OnlineEffects;
     std::map<uint32, MEffect *> m_ActiveEffects;
     std::map<uint32, MEffect *> m_OverloadEffects;
+    MEffect * m_defaultEffect;
 
     uint32 m_typeID;
 

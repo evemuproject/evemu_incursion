@@ -50,7 +50,13 @@ public:
 	bool isLowPower()										{ return m_Effects->isLowSlot(); }
 	bool isRig()											{ return false; }
 	bool isSubSystem()										{ return false; }
-    bool requiresTarget()									{ return false; }//m_Effects->GetIsAssistance() || m_Effects->GetIsOffensive(); }
+    bool requiresTarget()
+    {
+        if( m_Effects->HasDefaultEffect() )
+            return m_Effects->GetDefaultEffect()->GetIsAssistance() || m_Effects->GetDefaultEffect()->GetIsOffensive();
+        else
+            return false;
+    }
 
 protected:
 	ModifyShipAttributesComponent * m_ShipAttrComp;

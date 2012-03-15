@@ -29,6 +29,7 @@
 
 #include "ship/Modules/ModuleDefs.h"
 #include "ship/Modules/ModuleEffects.h"
+#include "inventory/EffectsEnum.h"
 
 
 //generic module base class - possibly should inherit from RefPtr...
@@ -82,24 +83,24 @@ public:
     virtual bool isTurretFitted()
     {
         // Try to make the effect called 'turretFitted' active, if it exists, to test for module being a turret:
-        //if( m_Effects->SetActiveEffect(42) )
-        //    return true;
-        //else
+        if( m_Effects->HasEffect(EveEffectEnum::Effect_turretFitted) )
+            return true;
+        else
             return false;
     }
 
     virtual bool isLauncherFitted()
     {
         // Try to make the effect called 'launcherFitted' active, if it exists, to test for module being a launcher:
-        //if( m_Effects->SetActiveEffect(40) )
-        //    return true;
-        //else
+        if( m_Effects->HasEffect(EveEffectEnum::Effect_launcherFitted) )
+            return true;
+        else
             return false;
     }
 
     virtual bool isMaxGroupFitLimited()
     {
-        if( m_Item->HasAttribute(AttrMaxGroupFitted) )
+        if( m_Item->HasAttribute(EveAttrEnum::AttrMaxGroupFitted) )
             return true;
         else
             return false;
